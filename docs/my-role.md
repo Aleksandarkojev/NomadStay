@@ -1,20 +1,37 @@
 My Role and Contributions
-Officially I had the role of Design Person within the Development Team.
+Official Role
+My official role within the NomadStay development team was Design Lead, with primary responsibility for wireframes, user experience, and interface design.
 
-My responsibilities expanded beyond wireframes and UI design and included:
+Contributions
+My responsibilities expanded beyond visual design and included work across several areas of the project:
 
 Interview creation and analysis
+Requirements gathering
 User Stories
-BDD scenarios
-Individual ER diagram
-SQL verification
-Clickable wireframes
-Documentation
-During Sprint 1 I also took an informal Scrum Master role by:
+BDD (Behaviour Driven Development) scenarios
+Individual ER diagram design
+SQL verification and testing
+Clickable wireframes and prototypes
+Project documentation
+Process and Coordination
+During Sprint 1, I also took on several responsibilities typically associated with Scrum facilitation.
 
-Explaining the Scrum process to the team
-Connecting interviews, User Stories, BDD and ER diagrams
-Reorganizing Trello
-Supporting sprint coordination
-Helping create a shared understanding of the workflow
-Although another team member officially held the Scrum Master role, I spent a significant amount of time facilitating communication and helping the team follow the intended process.
+My contributions included:
+
+Explaining the Scrum workflow to team members
+Connecting interviews, User Stories, BDD scenarios, and ER diagrams into a coherent development process
+Reorganizing the Trello board structure
+Supporting sprint coordination activities
+Helping create a shared understanding of project goals and deliverables
+Although another team member officially held the Scrum Master role, I spent a significant amount of time facilitating communication and helping the team follow the intended Scrum process.
+
+Current Development
+After the completion of the original team project, I continued developing NomadStay as an individual portfolio project.
+
+Current responsibilities include:
+
+Database validation and data quality improvement
+Schema refinement
+Repository management
+Documentation improvements
+Planning and implementation of the final web application
