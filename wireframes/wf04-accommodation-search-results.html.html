@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NomadStay - Interactive Query Wireframe</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
+
+    <!-- Header Navigation -->
+    <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-600 text-white p-2 rounded-xl shadow-md">
+                    <i class="fa-solid me-0 fa-laptop-house text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-brand-600 to-teal-500 bg-clip-text text-transparent">NomadStay</span>
+                    <span class="text-xs ml-2 px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-700 dark:text-brand-300 font-semibold border border-brand-200 dark:border-brand-800">
+                        v_boendeoversikt
+                    </span>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="flex items-center space-x-3">
+                <button id="toggleSqlBtn" onclick="toggleSqlPanel()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <i class="fa-solid fa-code text-brand-600 dark:text-brand-400"></i>
+                    <span class="hidden sm:inline">Visa SQL-fråga</span>
+                </button>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- Live SQL Banner / Drawer -->
+        <div id="sqlPanel" class="mb-6 bg-gray-900 text-gray-100 rounded-xl p-4 shadow-xl border border-gray-800 transition-all duration-300 overflow-hidden">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-gray-800">
+                <div class="flex items-center space-x-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    <i class="fa-solid fa-database text-brand-500"></i>
+                    <span>Aktiv SQL-Fråga (Uppdateras i realtid)</span>
+                </div>
+                <button onclick="copySql()" class="text-xs text-gray-400 hover:text-white transition flex items-center space-x-1 bg-gray-800 px-2 py-1 rounded">
+                    <i class="fa-regular fa-copy"></i>
+                    <span id="copyText">Kopiera SQL</span>
+                </button>
+            </div>
+            <pre id="sqlQueryDisplay" class="code-font text-xs sm:text-sm text-brand-400 overflow-x-auto whitespace-pre-wrap leading-relaxed py-1"></pre>
+        </div>
+
+        <!-- Filter Toolbar -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6 transition-colors">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Search Input (stad / land / namn) -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">
+                        <i class="fa-solid fa-magnifying-glass mr-1"></i> Sök Stad / Land / Namn
+                    </label>
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="T.ex. Lissabon, Sverige..."
+                           class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                </div>
+
+                <!-- WiFi Speed Filter Slider -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                            <i class="fa-solid fa-wifi mr-1"></i> Min WiFi-hastighet
+                        </label>
+                        <span id="wifiVal" class="text-xs font-bold text-brand-600 dark:text-brand-400">>= 100 Mbps</span>
+                    </div>
+                    <input type="range" id="wifiRange" min="0" max="1000" step="50" value="100" oninput="updateWifiLabel(); applyFilters();"
+                           class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                </div>
+
+                <!-- Max Distance to Coworking -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                            <i class="fa-solid fa-person-walking mr-1"></i> Max Avstånd Coworking
+                        </label>
+                        <span id="distVal" class="text-xs font-bold text-gray-700 dark:text-gray-300">Alla</span>
+                    </div>
+                    <select id="distSelect" onchange="applyFilters()"
+                            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                        <option value="ALL">Alla avstånd</option>
+                        <option value="0">Direkt i boendet (0m)</option>
+                        <option value="200"><= 200 meter</option>
+                        <option value="400"><= 400 meter</option>
+                    </select>
+                </div>
+
+                <!-- Sortering ORDER BY -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">
+                        <i class="fa-solid fa-arrow-down-short-wide mr-1"></i> Sortera Resultat (ORDER BY)
+                    </label>
+                    <select id="sortSelect" onchange="applyFilters()"
+                            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                        <option value="WIFI_DESC_DIST_ASC">WiFi (Fallande), Avstånd (Stigande)</option>
+                        <option value="PRICE_ASC">Lägsta pris (Stigande)</option>
+                        <option value="PRICE_DESC">Lägsta pris (Fallande)</option>
+                        <option value="DIST_ASC">Närmast Coworking</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Active Filters Summary & Reset -->
+            <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+                    <span>Hittade träffar: <strong id="resultCount" class="text-gray-900 dark:text-white font-bold">0</strong></span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="resetFilters()" class="text-xs text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 underline transition">
+                        Återställ filtrering
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accommodation Cards Grid -->
+        <div id="listingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards generated dynamically via JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 my-6">
+            <i class="fa-solid fa-filter-circle-xmark text-4xl text-gray-400 mb-3"></i>
+            <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200">Inga boenden matchar din sökning</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Prova att sänka WiFi-kravet eller rensa sökfiltret.</p>
+            <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition">
+                Nollställ filter
+            </button>
+        </div>
+    </main>
+
+    <!-- Property Detail Modal -->
+    <div id="propertyModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-gray-700 transition-all transform">
+            <div class="relative h-64 bg-gray-900 overflow-hidden rounded-t-2xl">
+                <img id="modalImg" src="" alt="" class="w-full h-full object-cover opacity-90">
+                <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/50 hover:bg-black/80 text-white w-9 h-9 rounded-full flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+                    <div>
+                        <span id="modalType" class="px-2.5 py-1 bg-brand-600 text-white text-xs font-semibold rounded-full uppercase tracking-wider mb-2 inline-block"></span>
+                        <h2 id="modalName" class="text-2xl font-bold text-white shadow-sm"></h2>
+                        <p id="modalLocation" class="text-sm text-gray-200 flex items-center mt-1">
+                            <i class="fa-solid fa-location-dot text-brand-400 mr-1.5"></i> <span></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <!-- Metrics Bar -->
+                <div class="grid grid-cols-3 gap-4 bg-gray-50 dark:bg-gray-700/40 p-4 rounded-xl text-center border border-gray-100 dark:border-gray-700">
+                    <div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">WiFi Speed</div>
+                        <div id="modalWifi" class="text-lg font-bold text-brand-600 dark:text-brand-400 mt-0.5"></div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">Coworking</div>
+                        <div id="modalCoworking" class="text-lg font-bold text-blue-600 dark:text-blue-400 mt-0.5"></div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">Lägsta Pris</div>
+                        <div id="modalPrice" class="text-lg font-bold text-gray-900 dark:text-white mt-0.5"></div>
+                    </div>
+                </div>
+
+                <!-- Specs & Features -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-3">Beskrivning & Utrustning</h4>
+                    <p id="modalDesc" class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed"></p>
+                    
+                    <div class="mt-4 flex flex-wrap gap-2" id="modalTags">
+                        <!-- Amenity Badges dynamically injected -->
+                    </div>
+                </div>
+
+                <!-- Booking Action Bar -->
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Totalpris från</span>
+                        <div id="modalPriceBottom" class="text-xl font-extrabold text-gray-900 dark:text-white"></div>
+                    </div>
+                    <button onclick="simulatedBooking()" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-600/30 transition transform active:scale-95">
+                        Reservera Boende
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Data and Application Logic -->
+    <script>
+        // Data derived directly from nomadstay_mysql.sql database script
+        const databaseListings = [
+            {
+                boende_id: 1,
+                namn: "Nomad House Lisbon",
+                stad: "Lissabon",
+                land: "Portugal",
+                boendetyp: "Co-living",
+                wifi_hastighet_mbps: 300,
+                avstand_coworking_meter: 150,
+                lagsta_pris_per_natt: 690,
+                valuta: "SEK",
+                bild: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
+                beskrivning: "Co-living med gemensamt kök, lounge och tysta ergonomiska arbetsytor anpassade för digitala nomader."
+            },
+            {
+                boende_id: 2,
+                namn: "Eixample Work Apartments",
+                stad: "Barcelona",
+                land: "Spanien",
+                boendetyp: "Lägenhet",
+                wifi_hastighet_mbps: 500,
+                avstand_coworking_meter: 350,
+                lagsta_pris_per_natt: 1250,
+                valuta: "SEK",
+                bild: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
+                beskrivning: "Moderna lägenheter i centrala Barcelona med eget kök, dedikerat skrivbord och extern skärm."
+            },
+            {
+                boende_id: 3,
+                namn: "Canggu Remote Village",
+                stad: "Canggu",
+                land: "Indonesien",
+                boendetyp: "Co-living",
+                wifi_hastighet_mbps: 250,
+                avstand_coworking_meter: 0,
+                lagsta_pris_per_natt: 720,
+                valuta: "SEK",
+                bild: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80",
+                beskrivning: "Tropiskt co-living med integrerad coworking-paviljong vid poolen och fantastisk community-känsla."
+            },
+            {
+                boende_id: 4,
+                namn: "Oresund Business Hotel",
+                stad: "Helsingborg",
+                land: "Sverige",
+                boendetyp: "Hotell",
+                wifi_hastighet_mbps: 1000,
+                avstand_coworking_meter: 200,
+                lagsta_pris_per_natt: 995,
+                valuta: "SEK",
+                bild: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+                beskrivning: "Centralt hotell i Helsingborg med blixtsnabb fiber (1 Gbps), frukostbuffé och business-lounge."
+            },
+            {
+                boende_id: 5,
+                namn: "Berlin Focus Studios",
+                stad: "Berlin",
+                land: "Tyskland",
+                boendetyp: "Lägenhet",
+                wifi_hastighet_mbps: 400,
+                avstand_coworking_meter: 500,
+                lagsta_pris_per_natt: 980,
+                valuta: "SEK",
+                bild: "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80",
+                beskrivning: "Tysta och stilrena studios i Friedrichshain anpassade för fokuserade längre arbetsvistelser."
+            },
+            {
+                boende_id: 8,
+                namn: "Helsingborg Harbour Apartment",
+                stad: "Helsingborg",
+                land: "Sverige",
+                boendetyp: "Lägenhet",
+                wifi_hastighet_mbps: 600,
+                avstand_coworking_meter: 300,
+                lagsta_pris_per_natt: 1750,
+                valuta: "SEK",
+                bild: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+                beskrivning: "Exklusiv lägenhet med utsikt över Öresund, stort skrivbord, ergonomisk stol och tvättmaskin."
+            }
+        ];
+
+        // State Management
+        let favorites = new Set();
+        let activeListings = [...databaseListings];
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            applyFilters();
+        });
+
+        // Theme Toggle Functionality
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = 'fa-solid fa-moon';
+            } else {
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-sun text-amber-400';
+            }
+        }
+
+        // Toggle SQL Code View Panel
+        function toggleSqlPanel() {
+            const panel = document.getElementById('sqlPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        // Update Slider Display Text
+        function updateWifiLabel() {
+            const val = document.getElementById('wifiRange').value;
+            document.getElementById('wifiVal').innerText = `>= ${val} Mbps`;
+        }
+
+        // Apply Search, Filters, and Sorting to Dataset
+        function applyFilters() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            const minWifi = parseInt(document.getElementById('wifiRange').value);
+            const maxDist = document.getElementById('distSelect').value;
+            const sortMode = document.getElementById('sortSelect').value;
+
+            // Filter logic matching SQL WHERE clauses
+            activeListings = databaseListings.filter(item => {
+                // Search filter (stad / land / namn)
+                const matchesSearch = !searchVal || 
+                    item.namn.toLowerCase().includes(searchVal) ||
+                    item.stad.toLowerCase().includes(searchVal) ||
+                    item.land.toLowerCase().includes(searchVal);
+
+                // WiFi Filter
+                const matchesWifi = item.wifi_hastighet_mbps >= minWifi;
+
+                // Distance Filter
+                let matchesDist = true;
+                if (maxDist !== 'ALL') {
+                    matchesDist = item.avstand_coworking_meter <= parseInt(maxDist);
+                }
+
+                return matchesSearch && matchesWifi && matchesDist;
+            });
+
+            // Sorting logic matching SQL ORDER BY clauses
+            activeListings.sort((a, b) => {
+                if (sortMode === 'WIFI_DESC_DIST_ASC') {
+                    if (b.wifi_hastighet_mbps !== a.wifi_hastighet_mbps) {
+                        return b.wifi_hastighet_mbps - a.wifi_hastighet_mbps;
+                    }
+                    return a.avstand_coworking_meter - b.avstand_coworking_meter;
+                } else if (sortMode === 'PRICE_ASC') {
+                    return a.lagsta_pris_per_natt - b.lagsta_pris_per_natt;
+                } else if (sortMode === 'PRICE_DESC') {
+                    return b.lagsta_pris_per_natt - a.lagsta_pris_per_natt;
+                } else if (sortMode === 'DIST_ASC') {
+                    return a.avstand_coworking_meter - b.avstand_coworking_meter;
+                }
+                return 0;
+            });
+
+            // Render Results and SQL String
+            renderCards(activeListings);
+            updateSqlQueryString(searchVal, minWifi, maxDist, sortMode);
+        }
+
+        // Construct Dynamic SQL Query String based on UI inputs
+        function updateSqlQueryString(search, minWifi, maxDist, sort) {
+            let whereClauses = [];
+            
+            if (minWifi > 0) {
+                whereClauses.push(`wifi_hastighet_mbps >= ${minWifi}`);
+            }
+            if (maxDist !== 'ALL') {
+                whereClauses.push(`avstand_coworking_meter <= ${maxDist}`);
+            }
+            if (search) {
+                whereClauses.push(`(LOWER(stad) LIKE '%${search}%' OR LOWER(land) LIKE '%${search}%' OR LOWER(namn) LIKE '%${search}%')`);
+            }
+
+            let orderByClause = "";
+            if (sort === 'WIFI_DESC_DIST_ASC') {
+                orderByClause = "ORDER BY wifi_hastighet_mbps DESC, avstand_coworking_meter ASC";
+            } else if (sort === 'PRICE_ASC') {
+                orderByClause = "ORDER BY lagsta_pris_per_natt ASC";
+            } else if (sort === 'PRICE_DESC') {
+                orderByClause = "ORDER BY lagsta_pris_per_natt DESC";
+            } else if (sort === 'DIST_ASC') {
+                orderByClause = "ORDER BY avstand_coworking_meter ASC";
+            }
+
+            const whereStr = whereClauses.length > 0 ? `\nWHERE ${whereClauses.join(' AND\n      ')}` : '';
+
+            const sql = `SELECT\n    namn,\n    stad,\n    land,\n    wifi_hastighet_mbps,\n    avstand_coworking_meter,\n    lagsta_pris_per_natt\nFROM v_boendeoversikt${whereStr}\n${orderByClause};`;
+
+            document.getElementById('sqlQueryDisplay').innerText = sql;
+        }
+
+        // Render Accommodation Cards in Grid View
+        function renderCards(items) {
+            const grid = document.getElementById('listingsGrid');
+            const empty = document.getElementById('emptyState');
+            document.getElementById('resultCount').innerText = items.length;
+
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            grid.innerHTML = items.map(item => {
+                const isFav = favorites.has(item.boende_id);
+                return `
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700/80 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col justify-between">
+                        <div>
+                            <!-- Image Header -->
+                            <div class="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                                <img src="${item.bild}" alt="${item.namn}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <button onclick="toggleFavorite(event, ${item.boende_id})" class="absolute top-3 right-3 bg-white/80 dark:bg-gray-900/80 hover:bg-white text-gray-700 dark:text-gray-200 p-2 rounded-full backdrop-blur-sm transition">
+                                    <i class="${isFav ? 'fa-solid text-red-500' : 'fa-regular'} fa-heart"></i>
+                                </button>
+                                <span class="absolute bottom-3 left-3 bg-gray-900/80 text-white text-xs px-2.5 py-1 rounded-md backdrop-blur-sm font-medium">
+                                    ${item.boendetyp}
+                                </span>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="p-5">
+                                <div class="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                    <i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i>
+                                    <span>${item.stad}, ${item.land}</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition cursor-pointer" onclick="openModal(${item.boende_id})">
+                                    ${item.namn}
+                                </h3>
+
+                                <!-- Key Query Badges -->
+                                <div class="mt-4 flex flex-wrap items-center gap-2">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                        <i class="fa-solid fa-wifi mr-1.5"></i> ${item.wifi_hastighet_mbps} Mbps
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                        <i class="fa-solid fa-person-walking mr-1.5"></i> ${item.avstand_coworking_meter === 0 ? 'I boendet' : item.avstand_coworking_meter + 'm coworking'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 block">Lägsta pris</span>
+                                <span class="text-lg font-extrabold text-gray-900 dark:text-white">${item.lagsta_pris_per_natt} ${item.valuta}</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">/ natt</span>
+                            </div>
+                            <button onclick="openModal(${item.boende_id})" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-sm transition">
+                                Detaljer & Boka
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle Favorite Item
+        function toggleFavorite(event, id) {
+            event.stopPropagation();
+            if (favorites.has(id)) {
+                favorites.delete(id);
+            } else {
+                favorites.add(id);
+            }
+            renderCards(activeListings);
+        }
+
+        // Reset All Filters to Defaults
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('wifiRange').value = 100;
+            document.getElementById('distSelect').value = 'ALL';
+            document.getElementById('sortSelect').value = 'WIFI_DESC_DIST_ASC';
+            updateWifiLabel();
+            applyFilters();
+        }
+
+        // Copy SQL snippet to clipboard
+        function copySql() {
+            const sqlText = document.getElementById('sqlQueryDisplay').innerText;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = sqlText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const copyTextBtn = document.getElementById('copyText');
+            copyTextBtn.innerText = 'Kopierad!';
+            setTimeout(() => {
+                copyTextBtn.innerText = 'Kopiera SQL';
+            }, 2000);
+        }
+
+        // Open Property Detail Modal
+        function openModal(id) {
+            const item = databaseListings.find(x => x.boende_id === id);
+            if (!item) return;
+
+            document.getElementById('modalImg').src = item.bild;
+            document.getElementById('modalName').innerText = item.namn;
+            document.getElementById('modalType').innerText = item.boendetyp;
+            document.getElementById('modalLocation').querySelector('span').innerText = `${item.stad}, ${item.land}`;
+            document.getElementById('modalWifi').innerText = `${item.wifi_hastighet_mbps} Mbps`;
+            document.getElementById('modalCoworking').innerText = item.avstand_coworking_meter === 0 ? '0m (Inkluderat)' : `${item.avstand_coworking_meter}m`;
+            document.getElementById('modalPrice').innerText = `${item.lagsta_pris_per_natt} ${item.valuta}`;
+            document.getElementById('modalPriceBottom').innerText = `${item.lagsta_pris_per_natt} ${item.valuta} / natt`;
+            document.getElementById('modalDesc').innerText = item.beskrivning;
+
+            // Generate Tags
+            const tags = [
+                '<span class="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-md"><i class="fa-solid fa-check text-green-500 mr-1"></i> Fiber-WiFi</span>',
+                '<span class="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-md"><i class="fa-solid fa-check text-green-500 mr-1"></i> Ergonomisk arbetsplats</span>',
+                '<span class="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-md"><i class="fa-solid fa-check text-green-500 mr-1"></i> Flexibel incheckning</span>'
+            ];
+            document.getElementById('modalTags').innerHTML = tags.join('');
+
+            document.getElementById('propertyModal').classList.remove('hidden');
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('propertyModal').classList.add('hidden');
+        }
+
+        // Simulated Booking Action
+        function simulatedBooking() {
+            alert('Bokningsförfrågan skickad för boendet! (Simulering)');
+            closeModal();
+        }
+    </script>
+</body>
+</html>
