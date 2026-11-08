@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NomadStay - Boendeöversikt Wireframe</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wireframe: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['Courier New', 'Courier', 'monospace'],
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for query console */
+        pre::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        pre::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-wireframe-100 text-wireframe-900 font-sans antialiased min-h-screen p-4 md:p-6">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- HEADER SECTION -->
+        <header class="bg-white border-2 border-wireframe-800 rounded-lg p-5 shadow-sm">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-dashed border-wireframe-200 pb-4 mb-4 gap-4">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-wireframe-900 text-white font-mono font-extrabold px-3 py-1 rounded text-lg uppercase tracking-wider">NomadStay</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-wireframe-200 text-wireframe-800 rounded border border-wireframe-400">Interactive Wireframe v2.4</span>
+                    </div>
+                    <h1 class="text-xl md:text-2xl font-black mt-2 text-wireframe-900">Kapacitet & Bokningsstatus Wireframe</h1>
+                </div>
+                
+                <!-- Traceability Badges Header -->
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <div class="bg-blue-50 border border-blue-300 text-blue-800 px-2.5 py-1 rounded font-medium flex items-center gap-1">
+                        <span class="font-bold">Mattias (Bokningar):</span> E1S1, E1S2, E1S3
+                    </div>
+                    <div class="bg-purple-50 border border-purple-300 text-purple-800 px-2.5 py-1 rounded font-medium flex items-center gap-1">
+                        <span class="font-bold">Arian (Företag):</span> Gruppbokningskapacitet
+                    </div>
+                </div>
+            </div>
+
+            <!-- BDD & Requirement Chips -->
+            <div class="flex flex-wrap gap-2 items-center text-xs">
+                <span class="font-bold uppercase tracking-wider text-wireframe-500 mr-1">BDD Scenarios:</span>
+                <span class="bg-red-100 text-red-800 border border-red-300 px-2 py-0.5 rounded font-mono font-bold">1. Fullbokat boende</span>
+                <span class="bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-mono font-bold">2. Nästan fullbokat boende</span>
+                <span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-mono font-bold">3. Ledigt boende</span>
+                <span class="text-wireframe-400 mx-1">|</span>
+                <span class="text-wireframe-600 italic">Intervjuinsikt: Undvik tid på alternativ som saknar kapacitet.</span>
+            </div>
+        </header>
+
+        <!-- DYNAMIC SQL QUERY CONSOLE -->
+        <div class="bg-wireframe-900 text-wireframe-100 rounded-lg p-4 font-mono text-xs border-2 border-wireframe-800 shadow-md">
+            <div class="flex justify-between items-center border-b border-wireframe-700 pb-2 mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                    <span class="text-emerald-400 font-bold uppercase tracking-wider">Aktiv SQL Query (Live Console)</span>
+                </div>
+                <div id="sqlClauseBadge" class="bg-wireframe-800 text-wireframe-300 px-2.5 py-0.5 rounded text-[11px] border border-wireframe-600">
+                    HAVING: Alla statusar
+                </div>
+            </div>
+            <pre id="sqlQueryDisplay" class="overflow-x-auto text-wireframe-200 leading-relaxed font-mono">
+<span class="text-blue-400 font-bold">SELECT</span>
+    b.boende_id,
+    b.namn,
+    <span class="text-purple-300">COUNT</span>(<span class="text-purple-300">DISTINCT</span> r.rum_id) <span class="text-blue-400">AS</span> antal_rum,
+    <span class="text-purple-300">COUNT</span>(<span class="text-purple-300">DISTINCT</span> br.rum_id) <span class="text-blue-400">AS</span> bokade_rum,
+    <span class="text-purple-300">COUNT</span>(<span class="text-purple-300">DISTINCT</span> r.rum_id) - <span class="text-purple-300">COUNT</span>(<span class="text-purple-300">DISTINCT</span> br.rum_id) <span class="text-blue-400">AS</span> lediga_rum,
+    <span class="text-amber-300">CASE</span>
+        <span class="text-amber-300">WHEN</span> <span class="text-purple-300">COUNT</span>(<span class="text-purple-300">DISTINCT</span> br.rum_id) >= <span class="text-purple-300">COUNT</span>(<span class="text-purple-300">DISTINCT</span> r.rum_id) <span class="text-amber-300">THEN</span> <span class="text-emerald-300">'fullbokad'</span>
+        <span class="text-amber-300">WHEN</span> <span class="text-purple-300">COUNT</span>(<span class="text-purple-300">DISTINCT</span> br.rum_id) >= <span class="text-purple-300">COUNT</span>(<span class="text-purple-300">DISTINCT</span> r.rum_id) * 0.8 <span class="text-amber-300">THEN</span> <span class="text-emerald-300">'nastan fullbokad'</span>
+        <span class="text-amber-300">ELSE</span> <span class="text-emerald-300">'ledig'</span>
+    <span class="text-amber-300">END AS</span> bokningsstatus
+<span class="text-blue-400">FROM</span> boende b
+<span class="text-blue-400">JOIN</span> rum r <span class="text-blue-400">ON</span> r.boende_id = b.boende_id
+<span class="text-blue-400">LEFT JOIN</span> bokning_rum br <span class="text-blue-400">ON</span> br.rum_id = r.rum_id
+<span class="text-blue-400">GROUP BY</span> b.boende_id, b.namn<span id="sqlDynamicHaving" class="text-yellow-300 font-bold"></span>;
+            </pre>
+        </div>
+
+        <!-- CONTROLS & FILTER BAR -->
+        <div class="bg-white border-2 border-wireframe-800 rounded-lg p-4 shadow-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Status Filter -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-wireframe-600 mb-1">
+                        Bokningsstatus (CASE Filter)
+                    </label>
+                    <select id="statusFilter" onchange="applyFilters()" class="w-full bg-wireframe-50 border-2 border-wireframe-300 rounded-md p-2 text-sm font-semibold text-wireframe-800 focus:outline-none focus:border-wireframe-900">
+                        <option value="ALL">Alla statusar</option>
+                        <option value="fullbokad">🛑 Fullbokad (100%)</option>
+                        <option value="nastan fullbokad">⚠️ Nästan fullbokad (≥80%)</option>
+                        <option value="ledig">🟢 Ledig (&lt;80%)</option>
+                    </select>
+                </div>
+
+                <!-- Corporate Capacity Filter -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-wireframe-600 mb-1">
+                        Min Lediga Rum (Arian Företag)
+                    </label>
+                    <select id="minRoomsFilter" onchange="applyFilters()" class="w-full bg-wireframe-50 border-2 border-wireframe-300 rounded-md p-2 text-sm font-semibold text-wireframe-800 focus:outline-none focus:border-wireframe-900">
+                        <option value="0">Inga minimikrav (Alla)</option>
+                        <option value="1">Minst 1 ledigt rum</option>
+                        <option value="2">Minst 2 lediga rum (Grupp)</option>
+                        <option value="3">Minst 3 lediga rum (Storgrupp)</option>
+                    </select>
+                </div>
+
+                <!-- Text Search -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-wireframe-600 mb-1">
+                        Sök Boendenamn
+                    </label>
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="T.ex. Lisbon, Studio..." class="w-full bg-wireframe-50 border-2 border-wireframe-300 rounded-md p-2 text-sm font-medium text-wireframe-800 focus:outline-none focus:border-wireframe-900 placeholder-wireframe-400">
+                </div>
+
+                <!-- Quick KPI Summary -->
+                <div class="flex items-end justify-between bg-wireframe-50 p-2.5 rounded-md border border-wireframe-300">
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-wireframe-500">Visar resultatsatser</div>
+                        <div class="text-lg font-black font-mono text-wireframe-900" id="resultCountText">0 / 0 boenden</div>
+                    </div>
+                    <button onclick="resetFilters()" class="text-xs font-bold text-wireframe-600 hover:text-wireframe-900 underline">
+                        Återställ
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- VIEW SWITCHER TABS -->
+        <div class="flex flex-wrap gap-2 border-b-2 border-wireframe-300 pb-2">
+            <button id="tab-grid" onclick="switchView('grid')" class="px-4 py-2 font-bold text-sm rounded-t-lg border-2 border-b-0 border-wireframe-800 bg-wireframe-900 text-white transition-all">
+                Design 2: Sökresultat (Kortvy)
+            </button>
+            <button id="tab-matrix" onclick="switchView('matrix')" class="px-4 py-2 font-bold text-sm rounded-t-lg border-2 border-b-0 border-wireframe-400 bg-wireframe-200 text-wireframe-700 hover:bg-wireframe-300 transition-all">
+                Företagskund Matris (Arian)
+            </button>
+            <button id="tab-table" onclick="switchView('table')" class="px-4 py-2 font-bold text-sm rounded-t-lg border-2 border-b-0 border-wireframe-400 bg-wireframe-200 text-wireframe-700 hover:bg-wireframe-300 transition-all">
+                Rå SQL Resultat Tabell
+            </button>
+        </div>
+
+        <!-- MAIN DYNAMIC CONTENT CONTAINER -->
+        <main id="mainContainer"></main>
+
+        <!-- FOOTER / BUSINESS VALUE SUMMARY -->
+        <footer class="bg-white border-2 border-wireframe-800 rounded-lg p-5 shadow-sm text-xs space-y-3">
+            <div class="font-bold text-sm uppercase tracking-wider text-wireframe-800 flex items-center gap-2">
+                <span>💡 Affärsvärde & Requirement Validation</span>
+            </div>
+            <p class="text-wireframe-600 leading-relaxed">
+                Denna query ger direkt stöd för NomadStays skallkrav att boenden kan bli fullbokade. Genom att tydliggöra kapacitetsstatus (<code class="bg-wireframe-100 px-1 font-bold">fullbokad</code>, <code class="bg-wireframe-100 px-1 font-bold">nastan fullbokad</code>, <code class="bg-wireframe-100 px-1 font-bold">ledig</code>) minskar vi risken för överbokning och hjälper såväl enskilda resenärer (Mattias) som företagskunder (Arian) att snabbt ta beslut utan att slösa tid på alternativ utan tillräcklig kapacitet.
+            </p>
+        </footer>
+
+    </div>
+
+    <!-- MODAL: DESIGN 3 - BOENDEDETALJER (BOENDEDETALJER VIEW) -->
+    <div id="detailModal" class="fixed inset-0 bg-wireframe-900/70 backdrop-blur-sm hidden justify-center items-center p-4 z-50">
+        <div class="bg-white border-4 border-wireframe-900 rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="p-5 bg-wireframe-100 border-b-2 border-wireframe-800 flex justify-between items-start">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-mono font-bold bg-wireframe-800 text-white px-2 py-0.5 rounded" id="modalBoendeId">BOENDE #</span>
+                        <span class="text-xs font-bold text-wireframe-500 uppercase tracking-wider">Design 3 – Boendedetaljer</span>
+                    </div>
+                    <h2 class="text-2xl font-black text-wireframe-900 mt-1" id="modalBoendeNavn">Boendenamn</h2>
+                </div>
+                <button onclick="closeModal()" class="text-wireframe-500 hover:text-wireframe-900 font-black text-2xl px-2 leading-none">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div class="p-5 overflow-y-auto space-y-5">
+                
+                <!-- Status & Progress Summary Card -->
+                <div class="bg-wireframe-50 border-2 border-wireframe-300 rounded-lg p-4 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-wider text-wireframe-600">Beräknad status</span>
+                        <div id="modalStatusBadge"></div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-mono font-bold mb-1">
+                            <span>Beläggningsgrad</span>
+                            <span id="modalOccupancyText">0% (0 / 0 rum)</span>
+                        </div>
+                        <div class="w-full bg-wireframe-200 h-3 rounded-full overflow-hidden border border-wireframe-400">
+                            <div id="modalProgressBar" class="h-full transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 text-center pt-2 border-t border-wireframe-200">
+                        <div>
+                            <div class="text-[10px] font-bold text-wireframe-500 uppercase">Totalt Antal Rum</div>
+                            <div class="text-lg font-black font-mono" id="modalAntalRum">0</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-wireframe-500 uppercase">Bokade Rum</div>
+                            <div class="text-lg font-black font-mono text-amber-700" id="modalBokadeRum">0</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-wireframe-500 uppercase">Lediga Rum</div>
+                            <div class="text-lg font-black font-mono text-emerald-700" id="modalLedigaRum">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Inventory Breakdown Table -->
+                <div>
+                    <h3 class="text-sm font-extrabold uppercase tracking-wider text-wireframe-800 mb-2 flex items-center justify-between">
+                        <span>Rumsinventarium & Tillgänglighet</span>
+                        <span class="text-xs font-normal text-wireframe-500">Koppling: RUM + BOKNING_RUM</span>
+                    </h3>
+                    <div class="border-2 border-wireframe-800 rounded-lg overflow-hidden">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-wireframe-100 border-b-2 border-wireframe-800 font-mono text-wireframe-800">
+                                <tr>
+                                    <th class="p-2.5">Rum ID</th>
+                                    <th class="p-2.5">Rumstyp</th>
+                                    <th class="p-2.5 text-center">Gäster</th>
+                                    <th class="p-2.5 text-right">Pris/natt</th>
+                                    <th class="p-2.5 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalRoomsTableBody" class="divide-y divide-wireframe-200">
+                                <!-- Rooms injected via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div class="p-4 bg-wireframe-100 border-t-2 border-wireframe-800 flex justify-between items-center">
+                <span class="text-xs text-wireframe-600 font-medium">Mattias E1S2: Boka ett eller flera tillgängliga rum</span>
+                <div class="flex gap-2">
+                    <button onclick="closeModal()" class="px-4 py-2 border-2 border-wireframe-400 bg-white font-bold text-xs rounded hover:bg-wireframe-200">
+                        Stäng
+                    </button>
+                    <button id="modalBookButton" class="px-4 py-2 border-2 border-wireframe-900 bg-wireframe-900 text-white font-bold text-xs rounded hover:bg-wireframe-800 shadow">
+                        Gå till Bokning →
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // MOCK DATABASE DATA (Directly reflecting tables: BOENDE, RUM, BOKNING_RUM)
+        const mockDatabase = [
+            {
+                boende_id: 101,
+                namn: "Nomad House Lisbon",
+                rooms: [
+                    { rum_id: 1001, typ: "Enkelrum Standard", gaster: 1, pris: 650, bokat: true },
+                    { rum_id: 1002, typ: "Dubbelrum Balkong", gaster: 2, pris: 890, bokat: false },
+                    { rum_id: 1003, typ: "Studio Superior", gaster: 2, pris: 1100, bokat: false },
+                    { rum_id: 1004, typ: "Suite Workstation", gaster: 3, pris: 1450, bokat: true },
+                    { rum_id: 1005, typ: "Enkelrum Ekonomi", gaster: 1, pris: 580, bokat: false }
+                ]
+            },
+            {
+                boende_id: 102,
+                namn: "Eixample Work Apartments Barcelona",
+                rooms: [
+                    { rum_id: 2001, typ: "Studio Loft", gaster: 2, pris: 1200, bokat: true },
+                    { rum_id: 2002, typ: "2-rumslägenhet", gaster: 4, pris: 1800, bokat: true },
+                    { rum_id: 2003, typ: "Penthouse Work", gaster: 4, pris: 2400, bokat: true },
+                    { rum_id: 2004, typ: "Studio Balkong", gaster: 2, pris: 1350, bokat: true },
+                    { rum_id: 2005, typ: "Enkelrum Focus", gaster: 1, pris: 950, bokat: true }
+                ]
+            },
+            {
+                boende_id: 103,
+                namn: "Canggu Remote Beach Village",
+                rooms: [
+                    { rum_id: 3001, typ: "Bungalow Garden", gaster: 2, pris: 750, bokat: true },
+                    { rum_id: 3002, typ: "Bungalow Pool View", gaster: 2, pris: 900, bokat: true },
+                    { rum_id: 3003, typ: "Villa Private Work", gaster: 4, pris: 1600, bokat: true },
+                    { rum_id: 3004, typ: "Bungalow Deluxe", gaster: 2, pris: 950, bokat: true },
+                    { rum_id: 3005, typ: "Shared Co-living Room", gaster: 1, pris: 450, bokat: false }
+                ]
+            },
+            {
+                boende_id: 104,
+                namn: "Öresund Business Hotel Helsingborg",
+                rooms: [
+                    { rum_id: 4001, typ: "Single Business", gaster: 1, pris: 1100, bokat: false },
+                    { rum_id: 4002, typ: "Double Executive", gaster: 2, pris: 1550, bokat: false },
+                    { rum_id: 4003, typ: "Suite Harbour View", gaster: 2, pris: 2100, bokat: false },
+                    { rum_id: 4004, typ: "Twin Corporate", gaster: 2, pris: 1400, bokat: false }
+                ]
+            },
+            {
+                boende_id: 105,
+                namn: "Berlin Mitte Focus Hub",
+                rooms: [
+                    { rum_id: 5001, typ: "Micro Apartment", gaster: 1, pris: 850, bokat: true },
+                    { rum_id: 5002, typ: "Studio City", gaster: 2, pris: 1150, bokat: true },
+                    { rum_id: 5003, typ: "Double Loft", gaster: 2, pris: 1300, bokat: true }
+                ]
+            },
+            {
+                boende_id: 106,
+                namn: "Split Coastal Coworking Lodge",
+                rooms: [
+                    { rum_id: 6001, typ: "Sea View Double", gaster: 2, pris: 980, bokat: false },
+                    { rum_id: 6002, typ: "Shared Room 4-bed", gaster: 1, pris: 380, bokat: false },
+                    { rum_id: 6003, typ: "Private Studio", gaster: 2, pris: 1120, bokat: true },
+                    { rum_id: 6004, typ: "Single Balcony", gaster: 1, pris: 720, bokat: false },
+                    { rum_id: 6005, typ: "Suite Ocean", gaster: 3, pris: 1650, bokat: false }
+                ]
+            }
+        ];
+
+        let currentActiveView = 'grid';
+
+        // EXECUTE THE EXACT SQL QUERY CALCULATION (simulating database aggregate + CASE statement)
+        function executeSQLQuery() {
+            return mockDatabase.map(b => {
+                const antal_rum = b.rooms.length;
+                const bokade_rum = b.rooms.filter(r => r.bokat).length;
+                const lediga_rum = antal_rum - bokade_rum;
+                
+                // EXACT SQL CASE STATEMENT LOGIC
+                let bokningsstatus = 'ledig';
+                if (bokade_rum >= antal_rum) {
+                    bokningsstatus = 'fullbokad';
+                } else if (bokade_rum >= antal_rum * 0.8) {
+                    bokningsstatus = 'nastan fullbokad';
+                } else {
+                    bokningsstatus = 'ledig';
+                }
+
+                return {
+                    boende_id: b.boende_id,
+                    namn: b.namn,
+                    antal_rum: antal_rum,
+                    bokade_rum: bokade_rum,
+                    lediga_rum: lediga_rum,
+                    bokningsstatus: bokningsstatus,
+                    rawRooms: b.rooms
+                };
+            });
+        }
+
+        // FILTER LOGIC
+        function getFilteredData() {
+            const rawResults = executeSQLQuery();
+            const statusVal = document.getElementById('statusFilter').value;
+            const minRoomsVal = parseInt(document.getElementById('minRoomsFilter').value, 10);
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            // Update SQL Dynamic Console HAVING display
+            const sqlClauseDisplay = document.getElementById('sqlDynamicHaving');
+            const sqlBadge = document.getElementById('sqlClauseBadge');
+
+            let havingClauses = [];
+            if (statusVal !== 'ALL') havingClauses.push(`bokningsstatus = '${statusVal}'`);
+            if (minRoomsVal > 0) havingClauses.push(`lediga_rum >= ${minRoomsVal}`);
+
+            if (havingClauses.length > 0) {
+                sqlClauseDisplay.innerText = `\nHAVING ` + havingClauses.join(' AND ');
+                sqlBadge.innerText = `HAVING: ${havingClauses.join(' AND ')}`;
+            } else {
+                sqlClauseDisplay.innerText = '';
+                sqlBadge.innerText = 'HAVING: Alla statusar';
+            }
+
+            return rawResults.filter(item => {
+                const matchStatus = (statusVal === 'ALL' || item.bokningsstatus === statusVal);
+                const matchMinRooms = (item.lediga_rum >= minRoomsVal);
+                const matchSearch = item.namn.toLowerCase().includes(searchVal);
+                return matchStatus && matchMinRooms && matchSearch;
+            });
+        }
+
+        // RENDER METHOD SWITCHER
+        function render() {
+            const data = getFilteredData();
+            const totalCount = mockDatabase.length;
+            document.getElementById('resultCountText').innerText = `${data.length} / ${totalCount} boenden`;
+
+            const container = document.getElementById('mainContainer');
+
+            if (currentActiveView === 'grid') {
+                renderGridResult(data, container);
+            } else if (currentActiveView === 'matrix') {
+                renderMatrixResult(data, container);
+            } else if (currentActiveView === 'table') {
+                renderTableResult(data, container);
+            }
+        }
+
+        // HELPER: STATUS BADGE GENERATOR
+        function getStatusBadgeHtml(status) {
+            if (status === 'fullbokad') {
+                return `<span class="inline-flex items-center gap-1 bg-red-100 text-red-800 border-2 border-red-300 font-mono font-bold text-xs px-2.5 py-1 rounded-full uppercase">🛑 Fullbokad</span>`;
+            } else if (status === 'nastan fullbokad') {
+                return `<span class="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border-2 border-amber-300 font-mono font-bold text-xs px-2.5 py-1 rounded-full uppercase">⚠️ Nästan fullbokad</span>`;
+            } else {
+                return `<span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-900 border-2 border-emerald-300 font-mono font-bold text-xs px-2.5 py-1 rounded-full uppercase">🟢 Ledig</span>`;
+            }
+        }
+
+        // DESIGN 2: GRID / CARD VIEW (SÖKRESULTAT)
+        function renderGridResult(data, container) {
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white border-2 border-dashed border-wireframe-400 rounded-lg p-12 text-center text-wireframe-500">
+                        <div class="text-3xl mb-2">🔍</div>
+                        <div class="font-bold text-base">Inga boenden matchar de valda kriterierna.</div>
+                        <div class="text-xs text-wireframe-400 mt-1">Sänk minimikravet på lediga rum eller ändra bokningsstatusfiltret.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">`;
+
+            data.forEach(item => {
+                const pct = Math.round((item.bokade_rum / item.antal_rum) * 100);
+                
+                let barColor = 'bg-emerald-500';
+                if (item.bokningsstatus === 'fullbokad') barColor = 'bg-red-500';
+                else if (item.bokningsstatus === 'nastan fullbokad') barColor = 'bg-amber-500';
+
+                html += `
+                    <div class="bg-white border-2 border-wireframe-800 rounded-lg p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+                        <div>
+                            <!-- Card Header -->
+                            <div class="flex justify-between items-start gap-2 mb-3">
+                                <div>
+                                    <span class="text-[10px] font-mono font-bold bg-wireframe-200 text-wireframe-700 px-1.5 py-0.5 rounded">ID: ${item.boende_id}</span>
+                                    <h3 class="font-black text-lg text-wireframe-900 mt-1 leading-snug">${item.namn}</h3>
+                                </div>
+                            </div>
+
+                            <!-- Status Pill -->
+                            <div class="mb-4">
+                                ${getStatusBadgeHtml(item.bokningsstatus)}
+                            </div>
+
+                            <!-- Visual Capacity Progress Bar -->
+                            <div class="space-y-1 mb-4 bg-wireframe-50 p-3 rounded border border-wireframe-200">
+                                <div class="flex justify-between text-xs font-mono font-bold text-wireframe-700">
+                                    <span>Kapacitet utnyttjad:</span>
+                                    <span>${pct}%</span>
+                                </div>
+                                <div class="w-full bg-wireframe-200 h-2.5 rounded-full overflow-hidden border border-wireframe-300">
+                                    <div class="${barColor} h-full" style="width: ${pct}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Key Metrics Grid -->
+                            <div class="grid grid-cols-3 text-center border-2 border-wireframe-200 rounded divide-x-2 divide-wireframe-200 bg-wireframe-50 text-xs py-2 mb-4">
+                                <div>
+                                    <div class="text-[10px] uppercase font-bold text-wireframe-500">Totalt</div>
+                                    <div class="font-mono font-black text-sm text-wireframe-900">${item.antal_rum} rum</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase font-bold text-wireframe-500">Bokade</div>
+                                    <div class="font-mono font-black text-sm text-amber-800">${item.bokade_rum} rum</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase font-bold text-wireframe-500">Lediga</div>
+                                    <div class="font-mono font-black text-sm text-emerald-800">${item.lediga_rum} rum</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Action Button -->
+                        <button onclick="openModal(${item.boende_id})" class="w-full bg-wireframe-100 hover:bg-wireframe-900 hover:text-white border-2 border-wireframe-800 font-bold text-xs py-2.5 px-3 rounded transition-colors flex items-center justify-center gap-2">
+                            <span>Granska Boendedetaljer (Design 3)</span>
+                            <span class="font-mono font-black">→</span>
+                        </button>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // VIEW: FÖRETAGSKUND MATRIS (ARIAN)
+        function renderMatrixResult(data, container) {
+            let html = `
+                <div class="bg-white border-2 border-wireframe-800 rounded-lg p-5 space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-wireframe-200 pb-3 gap-2">
+                        <div>
+                            <h3 class="font-black text-lg text-wireframe-900">Företagskund Gruppbokningsmatris</h3>
+                            <p class="text-xs text-wireframe-600">Verktyg för Arian att snabbt verifiera gruppkapacitet innan offert eller bokning.</p>
+                        </div>
+                        <span class="bg-purple-100 text-purple-900 border border-purple-300 text-xs font-mono font-bold px-3 py-1 rounded">
+                            Persona: Arian (Företagsbokningar)
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-wireframe-800 text-white font-mono uppercase">
+                                    <th class="p-3 border-r border-wireframe-700">Boende</th>
+                                    <th class="p-3 text-center border-r border-wireframe-700">Status</th>
+                                    <th class="p-3 text-center border-r border-wireframe-700">Lediga Rum</th>
+                                    <th class="p-3 text-center border-r border-wireframe-700">Lämplig för 2 pers team?</th>
+                                    <th class="p-3 text-center border-r border-wireframe-700">Lämplig för 3+ pers team?</th>
+                                    <th class="p-3 text-right">Åtgärd</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-wireframe-200 border-2 border-wireframe-800">
+            `;
+
+            data.forEach(item => {
+                const fitSmallGroup = item.lediga_rum >= 2;
+                const fitLargeGroup = item.lediga_rum >= 3;
+
+                html += `
+                    <tr class="hover:bg-wireframe-50 transition-colors">
+                        <td class="p-3 font-bold text-wireframe-900 border-r border-wireframe-200">
+                            ${item.namn}
+                            <div class="text-[10px] font-mono text-wireframe-500 font-normal">Boende ID: ${item.boende_id} | ${item.antal_rum} rum totalt</div>
+                        </td>
+                        <td class="p-3 text-center border-r border-wireframe-200">${getStatusBadgeHtml(item.bokningsstatus)}</td>
+                        <td class="p-3 text-center font-mono font-black text-sm border-r border-wireframe-200 ${item.lediga_rum === 0 ? 'text-red-600' : 'text-emerald-700'}">
+                            ${item.lediga_rum}
+                        </td>
+                        <td class="p-3 text-center border-r border-wireframe-200 font-mono font-bold">
+                            ${fitSmallGroup ? '<span class="text-emerald-700 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">✓ JA</span>' : '<span class="text-red-700 bg-red-100 border border-red-300 px-2 py-0.5 rounded">✕ NEJ</span>'}
+                        </td>
+                        <td class="p-3 text-center border-r border-wireframe-200 font-mono font-bold">
+                            ${fitLargeGroup ? '<span class="text-emerald-700 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">✓ JA</span>' : '<span class="text-red-700 bg-red-100 border border-red-300 px-2 py-0.5 rounded">✕ NEJ</span>'}
+                        </td>
+                        <td class="p-3 text-right">
+                            <button onclick="openModal(${item.boende_id})" class="bg-wireframe-800 text-white font-bold px-3 py-1.5 rounded hover:bg-wireframe-700 text-xs">
+                                Boka Grupp
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        // VIEW: RÅ SQL RESULTAT TABELL
+        function renderTableResult(data, container) {
+            let html = `
+                <div class="bg-white border-2 border-wireframe-800 rounded-lg p-5 space-y-3 shadow-sm">
+                    <div class="flex justify-between items-center border-b border-wireframe-200 pb-2">
+                        <h3 class="font-black text-sm text-wireframe-900 uppercase tracking-wider font-mono">Exakt Tabellresultat från SQL-Frågan</h3>
+                        <span class="text-xs text-wireframe-500 font-mono">GROUP BY b.boende_id, b.namn</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left font-mono text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-wireframe-100 text-wireframe-900 border-b-2 border-wireframe-800">
+                                    <th class="p-2.5 border-r border-wireframe-300">boende_id</th>
+                                    <th class="p-2.5 border-r border-wireframe-300">namn</th>
+                                    <th class="p-2.5 border-r border-wireframe-300 text-right">antal_rum</th>
+                                    <th class="p-2.5 border-r border-wireframe-300 text-right">bokade_rum</th>
+                                    <th class="p-2.5 border-r border-wireframe-300 text-right">lediga_rum</th>
+                                    <th class="p-2.5">bokningsstatus (CASE)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-wireframe-200 border-b-2 border-wireframe-800">
+            `;
+
+            data.forEach(item => {
+                html += `
+                    <tr class="hover:bg-wireframe-50">
+                        <td class="p-2.5 border-r border-wireframe-200">${item.boende_id}</td>
+                        <td class="p-2.5 border-r border-wireframe-200 font-sans font-bold text-wireframe-900">${item.namn}</td>
+                        <td class="p-2.5 border-r border-wireframe-200 text-right">${item.antal_rum}</td>
+                        <td class="p-2.5 border-r border-wireframe-200 text-right text-amber-800 font-bold">${item.bokade_rum}</td>
+                        <td class="p-2.5 border-r border-wireframe-200 text-right text-emerald-800 font-bold">${item.lediga_rum}</td>
+                        <td class="p-2.5 font-bold">${getStatusBadgeHtml(item.bokningsstatus)}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        // VIEW SWITCHING
+        function switchView(view) {
+            currentActiveView = view;
+            
+            ['grid', 'matrix', 'table'].forEach(v => {
+                const tab = document.getElementById(`tab-${v}`);
+                if (v === view) {
+                    tab.className = "px-4 py-2 font-bold text-sm rounded-t-lg border-2 border-b-0 border-wireframe-800 bg-wireframe-900 text-white transition-all";
+                } else {
+                    tab.className = "px-4 py-2 font-bold text-sm rounded-t-lg border-2 border-b-0 border-wireframe-400 bg-wireframe-200 text-wireframe-700 hover:bg-wireframe-300 transition-all";
+                }
+            });
+
+            render();
+        }
+
+        // FILTER EVENT HANDLERS
+        function applyFilters() {
+            render();
+        }
+
+        function resetFilters() {
+            document.getElementById('statusFilter').value = 'ALL';
+            document.getElementById('minRoomsFilter').value = '0';
+            document.getElementById('searchInput').value = '';
+            render();
+        }
+
+        // MODAL (DESIGN 3 - BOENDEDETALJER)
+        function openModal(boendeId) {
+            const rawData = executeSQLQuery();
+            const item = rawData.find(b => b.boende_id === boendeId);
+            if (!item) return;
+
+            document.getElementById('modalBoendeId').innerText = `BOENDE ID: ${item.boende_id}`;
+            document.getElementById('modalBoendeNavn').innerText = item.namn;
+            document.getElementById('modalStatusBadge').innerHTML = getStatusBadgeHtml(item.bokningsstatus);
+
+            const pct = Math.round((item.bokade_rum / item.antal_rum) * 100);
+            document.getElementById('modalOccupancyText').innerText = `${pct}% (${item.bokade_rum} av ${item.antal_rum} rum bokade)`;
+
+            const progressBar = document.getElementById('modalProgressBar');
+            progressBar.style.width = `${pct}%`;
+            if (item.bokningsstatus === 'fullbokad') progressBar.className = 'bg-red-500 h-full';
+            else if (item.bokningsstatus === 'nastan fullbokad') progressBar.className = 'bg-amber-500 h-full';
+            else progressBar.className = 'bg-emerald-500 h-full';
+
+            document.getElementById('modalAntalRum').innerText = item.antal_rum;
+            document.getElementById('modalBokadeRum').innerText = item.bokade_rum;
+            document.getElementById('modalLedigaRum').innerText = item.lediga_rum;
+
+            // Render room list breakdown
+            const tbody = document.getElementById('modalRoomsTableBody');
+            tbody.innerHTML = '';
+
+            item.rawRooms.forEach(room => {
+                const tr = document.createElement('tr');
+                tr.className = room.bokat ? 'bg-red-50/50' : 'bg-emerald-50/30';
+                tr.innerHTML = `
+                    <td class="p-2.5 font-mono font-bold">${room.rum_id}</td>
+                    <td class="p-2.5 font-bold text-wireframe-800">${room.typ}</td>
+                    <td class="p-2.5 text-center font-mono">${room.gaster} pers</td>
+                    <td class="p-2.5 text-right font-mono font-bold">${room.pris} SEK</td>
+                    <td class="p-2.5 text-center">
+                        ${room.bokat 
+                            ? '<span class="bg-red-100 text-red-800 border border-red-300 font-mono font-bold text-[10px] px-2 py-0.5 rounded">UPPTAGET</span>' 
+                            : '<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 font-mono font-bold text-[10px] px-2 py-0.5 rounded">LEDIGT</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const bookBtn = document.getElementById('modalBookButton');
+            if (item.lediga_rum === 0) {
+                bookBtn.disabled = true;
+                bookBtn.innerText = 'Fullbokat';
+                bookBtn.className = 'px-4 py-2 border-2 border-wireframe-300 bg-wireframe-200 text-wireframe-400 font-bold text-xs rounded cursor-not-allowed';
+            } else {
+                bookBtn.disabled = false;
+                bookBtn.innerText = 'Boka Tillgängliga Rum →';
+                bookBtn.className = 'px-4 py-2 border-2 border-wireframe-900 bg-wireframe-900 text-white font-bold text-xs rounded hover:bg-wireframe-800 shadow cursor-pointer';
+            }
+
+            document.getElementById('detailModal').classList.remove('hidden');
+            document.getElementById('detailModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.getElementById('detailModal').classList.remove('flex');
+        }
+
+        // INITIAL LOAD
+        window.onload = function() {
+            render();
+        };
+    </script>
+</body>
+</html>
