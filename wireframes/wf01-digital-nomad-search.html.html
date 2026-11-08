@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NomadStay - Epic E2 Digital Nomad Boendeöversikt Wireframe</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        wireframe: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        },
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="bg-wireframe-100 dark:bg-wireframe-900 text-wireframe-800 dark:text-wireframe-100 min-h-screen transition-colors duration-200">
+
+    <!-- Header Navigation -->
+    <header class="bg-white dark:bg-wireframe-800 border-b border-wireframe-300 dark:border-wireframe-700 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-wireframe-800 dark:bg-wireframe-100 text-white dark:text-wireframe-900 p-2 rounded-xl shadow-md">
+                    <i class="fa-solid fa-laptop-code text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl font-bold tracking-tight text-wireframe-900 dark:text-white">NomadStay</span>
+                        <span class="text-xs bg-brand-100 dark:bg-brand-900/60 text-brand-700 dark:text-brand-300 px-2.5 py-0.5 rounded-full font-bold border border-brand-300 dark:border-brand-700">
+                            v_digital_nomad_boende
+                        </span>
+                    </div>
+                    <p class="text-xs text-wireframe-500 dark:text-wireframe-400">Epic E2: Lucas - Digital Nomad Requirements</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleTraceabilityModal()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-brand-600 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 text-xs font-semibold hover:bg-brand-100 transition shadow-sm">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                    <span class="hidden sm:inline">User Stories & Spårbarhet (E2S1-E2S6)</span>
+                </button>
+                <button onclick="toggleSqlConsole()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-wireframe-300 dark:border-wireframe-600 text-xs font-medium hover:bg-wireframe-200 dark:hover:bg-wireframe-700 transition">
+                    <i class="fa-solid fa-terminal text-wireframe-600 dark:text-wireframe-400"></i>
+                    <span class="hidden sm:inline">SQL Fråga</span>
+                </button>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg border border-wireframe-300 dark:border-wireframe-600 text-wireframe-600 dark:text-wireframe-300 hover:bg-wireframe-200 dark:hover:bg-wireframe-700 transition">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- Top Banner: User Persona Banner -->
+        <div class="bg-white dark:bg-wireframe-800 rounded-2xl p-5 border border-wireframe-300 dark:border-wireframe-700 shadow-sm mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/60 border border-blue-300 dark:border-blue-700 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold text-xl shrink-0">
+                    L
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                        <h2 class="text-base font-bold text-wireframe-900 dark:text-white">Lucas (Digital Nomad Persona)</h2>
+                        <span class="text-[11px] code-font bg-wireframe-100 dark:bg-wireframe-700 text-wireframe-700 dark:text-wireframe-300 px-2 py-0.5 rounded border border-wireframe-300 dark:border-wireframe-600">
+                            Epic E2 Digital Nomad
+                        </span>
+                    </div>
+                    <p class="text-xs text-wireframe-600 dark:text-wireframe-400 mt-1">
+                        Söker arbetsvänliga boenden med garanterad WiFi-hastighet, ergonomisk arbetsplats och närhet till coworking.
+                    </p>
+                </div>
+            </div>
+
+            <!-- User Story Badges Mapping Summary -->
+            <div class="flex flex-wrap gap-1.5 max-w-md">
+                <span class="text-[10px] font-bold code-font bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-1 rounded border border-emerald-300 dark:border-emerald-800" title="WiFi-hastighet">
+                    [E2S1] WiFi ≥ 100Mbps
+                </span>
+                <span class="text-[10px] font-bold code-font bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2 py-1 rounded border border-blue-300 dark:border-blue-800" title="Dedikerad arbetsplats">
+                    [E2S2] Skrivbord
+                </span>
+                <span class="text-[10px] font-bold code-font bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 px-2 py-1 rounded border border-purple-300 dark:border-purple-800" title="Extern skärm">
+                    [E2S3] Extern Skärm
+                </span>
+                <span class="text-[10px] font-bold code-font bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 px-2 py-1 rounded border border-amber-300 dark:border-amber-800" title="Ergonomisk stol">
+                    [E2S4] Ergo-Stol
+                </span>
+                <span class="text-[10px] font-bold code-font bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300 px-2 py-1 rounded border border-teal-300 dark:border-teal-800" title="Avstånd till coworking">
+                    [E2S5] Coworking-Avstånd
+                </span>
+                <span class="text-[10px] font-bold code-font bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 px-2 py-1 rounded border border-indigo-300 dark:border-indigo-800" title="Tidszon">
+                    [E2S6] Tidszon
+                </span>
+            </div>
+        </div>
+
+        <!-- Dynamic Live SQL Output Panel -->
+        <div id="sqlConsole" class="mb-6 bg-wireframe-900 text-wireframe-100 rounded-2xl p-4 shadow-lg border border-wireframe-800">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-wireframe-800">
+                <div class="flex items-center space-x-2 text-xs font-semibold text-wireframe-400 uppercase tracking-wider">
+                    <i class="fa-solid fa-database text-brand-500"></i>
+                    <span>Realtids-genererad SQL-Fråga (Dynamisk View Filtering)</span>
+                </div>
+                <button onclick="copySql()" class="text-xs text-wireframe-400 hover:text-white transition flex items-center space-x-1 bg-wireframe-800 px-2 py-1 rounded">
+                    <i class="fa-regular fa-copy"></i>
+                    <span id="copyBtnText">Kopiera SQL</span>
+                </button>
+            </div>
+            <pre id="sqlOutput" class="code-font text-xs sm:text-sm text-brand-400 overflow-x-auto whitespace-pre-wrap leading-relaxed py-1"></pre>
+        </div>
+
+        <!-- Filter Controls Bar (Design 1: Startsida / Design 2: Sökresultat Filter) -->
+        <div class="bg-white dark:bg-wireframe-800 rounded-2xl border border-wireframe-300 dark:border-wireframe-700 shadow-sm p-5 mb-6">
+            <div class="flex items-center justify-between pb-3 mb-4 border-b border-wireframe-200 dark:border-wireframe-700">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-wireframe-700 dark:text-wireframe-300 flex items-center space-x-2">
+                    <i class="fa-solid fa-sliders text-brand-600"></i>
+                    <span>Nomad-Filter (Kopplade till User Stories)</span>
+                </h3>
+                <button onclick="resetFilters()" class="text-xs text-wireframe-500 hover:text-wireframe-800 dark:hover:text-wireframe-200 underline">
+                    Återställ alla filter
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                
+                <!-- Filter 1: WiFi Speed [E2S1] -->
+                <div>
+                    <label class="block text-xs font-bold text-wireframe-700 dark:text-wireframe-300 mb-1.5">
+                        <span class="text-emerald-600 dark:text-emerald-400 code-font">[E2S1]</span> Minsta WiFi-hastighet:
+                    </label>
+                    <div class="flex items-center space-x-1">
+                        <button onclick="setWifiFilter(0)" id="wifiBtn0" class="wifi-preset-btn px-2.5 py-1 text-xs font-semibold rounded-lg border transition border-wireframe-300 dark:border-wireframe-600 bg-wireframe-100 dark:bg-wireframe-700">Alla</button>
+                        <button onclick="setWifiFilter(100)" id="wifiBtn100" class="wifi-preset-btn px-2.5 py-1 text-xs font-semibold rounded-lg border transition border-wireframe-300 dark:border-wireframe-600">≥100</button>
+                        <button onclick="setWifiFilter(300)" id="wifiBtn300" class="wifi-preset-btn px-2.5 py-1 text-xs font-semibold rounded-lg border transition border-wireframe-300 dark:border-wireframe-600">≥300</button>
+                        <button onclick="setWifiFilter(500)" id="wifiBtn500" class="wifi-preset-btn px-2.5 py-1 text-xs font-semibold rounded-lg border transition border-wireframe-300 dark:border-wireframe-600">≥500 Mbps</button>
+                    </div>
+                </div>
+
+                <!-- Filter 2: Workstation Equipment Checkboxes [E2S2, E2S3, E2S4] -->
+                <div>
+                    <label class="block text-xs font-bold text-wireframe-700 dark:text-wireframe-300 mb-1.5">
+                        Arbetsutrustning på boendet:
+                    </label>
+                    <div class="space-y-1 text-xs">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="chkSkrivbord" onchange="applyFilters()" class="rounded border-wireframe-300 text-brand-600 focus:ring-brand-500" checked>
+                            <span><strong class="code-font text-blue-600 dark:text-blue-400">[E2S2]</strong> Skrivbord (`skrivbord`)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="chkSkarm" onchange="applyFilters()" class="rounded border-wireframe-300 text-brand-600 focus:ring-brand-500">
+                            <span><strong class="code-font text-purple-600 dark:text-purple-400">[E2S3]</strong> Extern Skärm (`extern_skarm`)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="chkStol" onchange="applyFilters()" class="rounded border-wireframe-300 text-brand-600 focus:ring-brand-500">
+                            <span><strong class="code-font text-amber-600 dark:text-amber-400">[E2S4]</strong> Ergonomisk Stol (`ergonomisk_stol`)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Filter 3: Coworking Distance [E2S5] -->
+                <div>
+                    <label class="block text-xs font-bold text-wireframe-700 dark:text-wireframe-300 mb-1.5">
+                        <span class="text-teal-600 dark:text-teal-400 code-font">[E2S5]</span> Max Avstånd till Coworking:
+                    </label>
+                    <select id="selCoworking" onchange="applyFilters()" class="w-full text-xs p-2 rounded-lg border border-wireframe-300 dark:border-wireframe-600 bg-wireframe-50 dark:bg-wireframe-700 text-wireframe-800 dark:text-wireframe-100">
+                        <option value="9999">Alla avstånd</option>
+                        <option value="200">Max 200 meter (Gångavstånd)</option>
+                        <option value="400">Max 400 meter</option>
+                        <option value="600">Max 600 meter</option>
+                    </select>
+                </div>
+
+                <!-- Filter 4: Timezone Filter [E2S6] -->
+                <div>
+                    <label class="block text-xs font-bold text-wireframe-700 dark:text-wireframe-300 mb-1.5">
+                        <span class="text-indigo-600 dark:text-indigo-400 code-font">[E2S6]</span> Tidszon (`tidszon`):
+                    </label>
+                    <select id="selTimezone" onchange="applyFilters()" class="w-full text-xs p-2 rounded-lg border border-wireframe-300 dark:border-wireframe-600 bg-wireframe-50 dark:bg-wireframe-700 text-wireframe-800 dark:text-wireframe-100">
+                        <option value="ALL">Alla Tidszoner</option>
+                        <option value="UTC+0">UTC+0 (Portugal)</option>
+                        <option value="UTC+1">UTC+1 (Spanien, Sverige, Tyskland, Kroatien)</option>
+                        <option value="UTC+8">UTC+8 (Indonesien)</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- View Switcher Tabs -->
+        <div class="flex items-center justify-between border-b border-wireframe-300 dark:border-wireframe-700 mb-6 pb-2">
+            <div class="flex space-x-2 sm:space-x-4">
+                <button id="viewGridBtn" onclick="switchView('grid')" class="px-3 py-2 text-xs font-bold rounded-lg bg-wireframe-800 text-white dark:bg-white dark:text-wireframe-900 shadow-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-grid-2"></i>
+                    <span>Kortvy (Design 2 Sökresultat)</span>
+                </button>
+                <button id="viewTableBtn" onclick="switchView('table')" class="px-3 py-2 text-xs font-bold rounded-lg text-wireframe-600 dark:text-wireframe-400 hover:bg-wireframe-200 dark:hover:bg-wireframe-700 flex items-center space-x-2">
+                    <i class="fa-solid fa-table"></i>
+                    <span>Rå Tabellvy (v_digital_nomad_boende)</span>
+                </button>
+                <button id="viewCompareBtn" onclick="switchView('compare')" class="px-3 py-2 text-xs font-bold rounded-lg text-wireframe-600 dark:text-wireframe-400 hover:bg-wireframe-200 dark:hover:bg-wireframe-700 flex items-center space-x-2">
+                    <i class="fa-solid fa-code-compare text-brand-600"></i>
+                    <span>Jämför Arbetsmöjligheter (<span id="compareCountTag">0</span>)</span>
+                </button>
+            </div>
+            <div class="text-xs text-wireframe-500 code-font">
+                Antal träffar: <strong id="resultCount" class="text-wireframe-900 dark:text-white font-bold">8</strong>
+            </div>
+        </div>
+
+        <!-- VIEW 1: RESULTS GRID (Design 2 Sökresultat) -->
+        <div id="viewGrid" class="view-content">
+            <div id="gridCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Injected dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- VIEW 2: DATABASE TABLE VIEW -->
+        <div id="viewTable" class="view-content hidden">
+            <div class="bg-white dark:bg-wireframe-800 rounded-2xl border border-wireframe-300 dark:border-wireframe-700 shadow-sm overflow-hidden p-4">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-wireframe-100 dark:bg-wireframe-700 text-wireframe-700 dark:text-wireframe-200 code-font border-b border-wireframe-300 dark:border-wireframe-600">
+                                <th class="p-2.5">boende_id</th>
+                                <th class="p-2.5">namn</th>
+                                <th class="p-2.5">stad</th>
+                                <th class="p-2.5">land</th>
+                                <th class="p-2.5">tidszon [E2S6]</th>
+                                <th class="p-2.5">wifi_hastighet_mbps [E2S1]</th>
+                                <th class="p-2.5">avstand_coworking_meter [E2S5]</th>
+                                <th class="p-2.5 text-center">skrivbord [E2S2]</th>
+                                <th class="p-2.5 text-center">extern_skarm [E2S3]</th>
+                                <th class="p-2.5 text-center">ergonomisk_stol [E2S4]</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableRowsContainer" class="divide-y divide-wireframe-200 dark:divide-wireframe-700 code-font">
+                            <!-- Injected dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: PROPERTY COMPARISON MATRIX (BDD Scenario: Jämföra arbetsmöjligheter) -->
+        <div id="viewCompare" class="view-content hidden">
+            <div class="bg-white dark:bg-wireframe-800 rounded-2xl border border-wireframe-300 dark:border-wireframe-700 shadow-sm p-6">
+                <div class="mb-4 pb-3 border-b border-wireframe-200 dark:border-wireframe-700 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-base font-bold text-wireframe-900 dark:text-white">
+                            Jämför Arbetsmöjligheter (BDD Scenario 3)
+                        </h3>
+                        <p class="text-xs text-wireframe-500 dark:text-wireframe-400 mt-0.5">
+                            Sida-vid-sida-utvärdering av WiFi, skrivbord, skärm, ergonomi och coworking för nomader.
+                        </p>
+                    </div>
+                    <button onclick="clearComparison()" class="text-xs text-red-600 dark:text-red-400 underline">
+                        Rensa alla i jämförelse
+                    </button>
+                </div>
+
+                <div id="compareMatrixContainer" class="overflow-x-auto">
+                    <!-- Dynamic Matrix Table injected via JS -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- TRACEABILITY & USER STORY MODAL -->
+    <div id="traceabilityModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-wireframe-800 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-wireframe-300 dark:border-wireframe-700 shadow-2xl p-6">
+            <div class="flex items-center justify-between pb-4 border-b border-wireframe-200 dark:border-wireframe-700">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-brand-600 text-white p-2 rounded-xl">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-wireframe-900 dark:text-white">Kravspårbarhet & User Stories</h3>
+                        <p class="text-xs text-wireframe-500 dark:text-wireframe-400">Lucas – Epic E2 Digital Nomad (v_digital_nomad_boende)</p>
+                    </div>
+                </div>
+                <button onclick="toggleTraceabilityModal()" class="text-wireframe-400 hover:text-wireframe-700 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="mt-6 space-y-6 text-xs leading-relaxed">
+                
+                <!-- User Stories E2S1 to E2S6 -->
+                <div>
+                    <h4 class="font-bold text-sm text-wireframe-900 dark:text-white mb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-user-check text-brand-600"></i>
+                        <span>User Stories (E2S1 - E2S6)</span>
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl">
+                            <span class="font-bold code-font text-emerald-800 dark:text-emerald-300 block">E2S1 – WiFi-hastighet</span>
+                            Som digital nomad vill jag kunna se ett boendes WiFi-hastighet.
+                            <div class="mt-1 font-mono text-[10px] text-emerald-700 dark:text-emerald-400">Koppling: v_digital_nomad_boende.wifi_hastighet_mbps</div>
+                        </div>
+                        <div class="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl">
+                            <span class="font-bold code-font text-blue-800 dark:text-blue-300 block">E2S2 – Dedikerad Arbetsplats</span>
+                            Som digital nomad vill jag kunna se om boendet erbjuder en dedikerad arbetsplats.
+                            <div class="mt-1 font-mono text-[10px] text-blue-700 dark:text-blue-400">Koppling: v_digital_nomad_boende.skrivbord (TINYINT 1/0)</div>
+                        </div>
+                        <div class="p-3 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-xl">
+                            <span class="font-bold code-font text-purple-800 dark:text-purple-300 block">E2S3 – Extern Skärm</span>
+                            Som digital nomad vill jag kunna se om en extern skärm finns tillgänglig.
+                            <div class="mt-1 font-mono text-[10px] text-purple-700 dark:text-purple-400">Koppling: v_digital_nomad_boende.extern_skarm (TINYINT 1/0)</div>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl">
+                            <span class="font-bold code-font text-amber-800 dark:text-amber-300 block">E2S4 – Ergonomisk Stol</span>
+                            Som digital nomad vill jag kunna se om boendet erbjuder en ergonomisk kontorsstol.
+                            <div class="mt-1 font-mono text-[10px] text-amber-700 dark:text-amber-400">Koppling: v_digital_nomad_boende.ergonomisk_stol (TINYINT 1/0)</div>
+                        </div>
+                        <div class="p-3 bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 rounded-xl">
+                            <span class="font-bold code-font text-teal-800 dark:text-teal-300 block">E2S5 – Coworking-Avstånd</span>
+                            Som digital nomad vill jag kunna se avståndet till närmaste coworking-space.
+                            <div class="mt-1 font-mono text-[10px] text-teal-700 dark:text-teal-400">Koppling: v_digital_nomad_boende.avstand_coworking_meter</div>
+                        </div>
+                        <div class="p-3 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-xl">
+                            <span class="font-bold code-font text-indigo-800 dark:text-indigo-300 block">E2S6 – Tidszon</span>
+                            Som digital nomad vill jag kunna se destinationens tidszon.
+                            <div class="mt-1 font-mono text-[10px] text-indigo-700 dark:text-indigo-400">Koppling: v_digital_nomad_boende.tidszon</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BDD Scenarios -->
+                <div>
+                    <h4 class="font-bold text-sm text-wireframe-900 dark:text-white mb-2 flex items-center space-x-2">
+                        <i class="fa-solid fa-vial text-brand-600"></i>
+                        <span>BDD-Scenarier</span>
+                    </h4>
+                    <div class="bg-wireframe-100 dark:bg-wireframe-700/50 p-3 rounded-xl border border-wireframe-300 dark:border-wireframe-600 space-y-2">
+                        <p><strong>1. Hitta arbetsvänligt boende:</strong> Givet att jag söker boenden -> När jag filtrerar på hög WiFi-hastighet -> Så ska jag få upp boenden som passar för distansarbete.</p>
+                        <p><strong>2. Hitta coworking nära boendet:</strong> Givet att jag söker boenden -> När jag tittar på ett boende -> Så ska jag kunna se avståndet till coworking-space.</p>
+                        <p><strong>3. Jämföra arbetsmöjligheter:</strong> Givet flera boenden -> När jag jämför resultaten -> Så ska WiFi, skrivbord och arbetsutrustning visas.</p>
+                    </div>
+                </div>
+
+                <!-- Business Value -->
+                <div>
+                    <h4 class="font-bold text-sm text-wireframe-900 dark:text-white mb-2 flex items-center space-x-2">
+                        <i class="fa-solid fa-chart-line text-brand-600"></i>
+                        <span>Affärsvärde</span>
+                    </h4>
+                    <p class="text-wireframe-600 dark:text-wireframe-300">
+                        Denna vy hjälper användaren att direkt avgöra om ett boende fungerar för distansarbete, om nödvändig utrustning finns på plats och om coworking finns tillgängligt i närheten. Det stödjer NomadStays huvudmål att underlätta för digitala nomader att kombinera arbete och resande.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript -->
+    <script>
+        // Full dataset for v_digital_nomad_boende view
+        const digitalNomadSeed = [
+            {
+                boende_id: 4,
+                namn: "Öresund Business Hotel",
+                stad: "Helsingborg",
+                land: "Sverige",
+                tidszon: "UTC+1",
+                wifi_hastighet_mbps: 1000,
+                avstand_coworking_meter: 200,
+                skrivbord: 1,
+                extern_skarm: 1,
+                ergonomisk_stol: 1,
+                bild: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 8,
+                namn: "Helsingborg Harbour Apartment",
+                stad: "Helsingborg",
+                land: "Sverige",
+                tidszon: "UTC+1",
+                wifi_hastighet_mbps: 600,
+                avstand_coworking_meter: 300,
+                skrivbord: 1,
+                extern_skarm: 1,
+                ergonomisk_stol: 1,
+                bild: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 2,
+                namn: "Eixample Work Apartments",
+                stad: "Barcelona",
+                land: "Spanien",
+                tidszon: "UTC+1",
+                wifi_hastighet_mbps: 500,
+                avstand_coworking_meter: 350,
+                skrivbord: 1,
+                extern_skarm: 1,
+                ergonomisk_stol: 1,
+                bild: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 5,
+                namn: "Berlin Focus Studios",
+                stad: "Berlin",
+                land: "Tyskland",
+                tidszon: "UTC+1",
+                wifi_hastighet_mbps: 400,
+                avstand_coworking_meter: 500,
+                skrivbord: 1,
+                extern_skarm: 1,
+                ergonomisk_stol: 1,
+                bild: "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 1,
+                namn: "Nomad House Lisbon",
+                stad: "Lissabon",
+                land: "Portugal",
+                tidszon: "UTC+0",
+                wifi_hastighet_mbps: 300,
+                avstand_coworking_meter: 150,
+                skrivbord: 1,
+                extern_skarm: 1,
+                ergonomisk_stol: 1,
+                bild: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 3,
+                namn: "Canggu Remote Village",
+                stad: "Canggu",
+                land: "Indonesien",
+                tidszon: "UTC+8",
+                wifi_hastighet_mbps: 250,
+                avstand_coworking_meter: 0,
+                skrivbord: 1,
+                extern_skarm: 1,
+                ergonomisk_stol: 0,
+                bild: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 7,
+                namn: "Alfama Boutique Hotel",
+                stad: "Lissabon",
+                land: "Portugal",
+                tidszon: "UTC+0",
+                wifi_hastighet_mbps: 200,
+                avstand_coworking_meter: 450,
+                skrivbord: 1,
+                extern_skarm: 0,
+                ergonomisk_stol: 1,
+                bild: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 6,
+                namn: "Split Social Hostel",
+                stad: "Split",
+                land: "Kroatien",
+                tidszon: "UTC+1",
+                wifi_hastighet_mbps: 150,
+                avstand_coworking_meter: 700,
+                skrivbord: 1,
+                extern_skarm: 0,
+                ergonomisk_stol: 0,
+                bild: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"
+            }
+        ];
+
+        // State
+        let currentWifiMin = 0;
+        let activeView = 'grid';
+        let compareList = [4, 1]; // Pre-selected for comparison demo
+
+        // DOM Ready Initializer
+        document.addEventListener('DOMContentLoaded', () => {
+            applyFilters();
+        });
+
+        // WiFi Filter Presets
+        function setWifiFilter(val) {
+            currentWifiMin = val;
+            
+            // Toggle active styling on buttons
+            document.querySelectorAll('.wifi-preset-btn').forEach(btn => {
+                btn.className = "wifi-preset-btn px-2.5 py-1 text-xs font-semibold rounded-lg border transition border-wireframe-300 dark:border-wireframe-600 bg-wireframe-100 dark:bg-wireframe-700";
+            });
+
+            const activeBtn = document.getElementById(`wifiBtn${val}`);
+            if (activeBtn) {
+                activeBtn.className = "wifi-preset-btn px-2.5 py-1 text-xs font-semibold rounded-lg border transition border-brand-600 bg-brand-600 text-white dark:bg-brand-600 shadow-sm";
+            }
+
+            applyFilters();
+        }
+
+        // Apply filters and re-render view
+        function applyFilters() {
+            const chkDesk = document.getElementById('chkSkrivbord').checked;
+            const chkMonitor = document.getElementById('chkSkarm').checked;
+            const chkChair = document.getElementById('chkStol').checked;
+            const maxDist = parseInt(document.getElementById('selCoworking').value);
+            const selectedTz = document.getElementById('selTimezone').value;
+
+            // Filter Dataset
+            const filtered = digitalNomadSeed.filter(item => {
+                if (item.wifi_hastighet_mbps < currentWifiMin) return false;
+                if (chkDesk && item.skrivbord !== 1) return false;
+                if (chkMonitor && item.extern_skarm !== 1) return false;
+                if (chkChair && item.ergonomisk_stol !== 1) return false;
+                if (item.avstand_coworking_meter > maxDist) return false;
+                if (selectedTz !== 'ALL' && item.tidszon !== selectedTz) return false;
+                return true;
+            });
+
+            // Sort by WiFi DESC as per base query
+            filtered.sort((a, b) => b.wifi_hastighet_mbps - a.wifi_hastighet_mbps);
+
+            // Render Output Views
+            renderGrid(filtered);
+            renderTable(filtered);
+            renderCompareMatrix();
+            updateSqlConsole(chkDesk, chkMonitor, chkChair, maxDist, selectedTz);
+
+            document.getElementById('resultCount').innerText = filtered.length;
+            document.getElementById('compareCountTag').innerText = compareList.length;
+        }
+
+        // Render Cards View (Design 2 Sökresultat)
+        function renderGrid(items) {
+            const container = document.getElementById('gridCardsContainer');
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-wireframe-500 dark:text-wireframe-400">
+                        <i class="fa-solid fa-filter-circle-xmark text-4xl mb-3">
+                        </i>
+                        <p class="font-bold">Inga boenden matchar dina nomadkrav.</p>
+                        <p class="text-xs">Sänk minimikraven i filtret ovan för att se fler resultat.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = items.map(item => {
+                const isCompared = compareList.includes(item.boende_id);
+
+                return `
+                    <div class="bg-white dark:bg-wireframe-800 rounded-2xl border border-wireframe-300 dark:border-wireframe-700 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+                        <div>
+                            <!-- Image Header -->
+                            <div class="relative h-44 bg-wireframe-900">
+                                <img src="${item.bild}" alt="${item.namn}" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                                <div class="absolute top-3 left-3 flex gap-1">
+                                    <span class="px-2.5 py-0.5 bg-black/60 text-white backdrop-blur-md rounded-full text-[10px] font-bold code-font">
+                                        ID: ${item.boende_id}
+                                    </span>
+                                    <span class="px-2.5 py-0.5 bg-indigo-900/80 text-indigo-200 backdrop-blur-md rounded-full text-[10px] font-bold code-font" title="[E2S6] Tidszon">
+                                        ${item.tidszon}
+                                    </span>
+                                </div>
+                                <div class="absolute bottom-3 left-3 right-3 text-white">
+                                    <h3 class="font-bold text-base leading-tight">${item.namn}</h3>
+                                    <p class="text-xs text-wireframe-300 flex items-center mt-0.5">
+                                        <i class="fa-solid fa-location-dot mr-1 text-brand-400"></i> ${item.stad}, ${item.land}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Attribute Badge Grid Mapping E2S1-E2S6 -->
+                            <div class="p-4 space-y-3">
+                                
+                                <!-- E2S1 WiFi Speed Badge -->
+                                <div class="flex items-center justify-between p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
+                                    <span class="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center">
+                                        <i class="fa-solid fa-wifi mr-1.5"></i> WiFi-Hastighet
+                                    </span>
+                                    <span class="text-xs font-black code-font text-emerald-700 dark:text-emerald-300">
+                                        ${item.wifi_hastighet_mbps} Mbps <span class="text-[9px] font-normal text-emerald-600">[E2S1]</span>
+                                    </span>
+                                </div>
+
+                                <!-- E2S5 Coworking Distance -->
+                                <div class="flex items-center justify-between p-2 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800">
+                                    <span class="text-xs font-bold text-teal-800 dark:text-teal-300 flex items-center">
+                                        <i class="fa-solid fa-building-user mr-1.5"></i> Coworking-Avstånd
+                                    </span>
+                                    <span class="text-xs font-black code-font text-teal-700 dark:text-teal-300">
+                                        ${item.avstand_coworking_meter === 0 ? '0 m (I samma byggnad)' : item.avstand_coworking_meter + ' m'}
+                                        <span class="text-[9px] font-normal text-teal-600">[E2S5]</span>
+                                    </span>
+                                </div>
+
+                                <!-- E2S2, E2S3, E2S4 Workstation Indicators -->
+                                <div class="pt-2 border-t border-wireframe-200 dark:border-wireframe-700">
+                                    <span class="text-[10px] uppercase font-bold code-font text-wireframe-400 block mb-1.5">Arbetsutrustning på rummet:</span>
+                                    <div class="grid grid-cols-3 gap-1.5 text-[11px] font-semibold">
+                                        <!-- Skrivbord -->
+                                        <div class="p-1.5 rounded text-center ${item.skrivbord ? 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800' : 'bg-wireframe-100 dark:bg-wireframe-700 text-wireframe-400 opacity-50'}">
+                                            <i class="fa-solid fa-desk block mb-0.5"></i> Skrivbord
+                                        </div>
+                                        <!-- Extern Skärm -->
+                                        <div class="p-1.5 rounded text-center ${item.extern_skarm ? 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800' : 'bg-wireframe-100 dark:bg-wireframe-700 text-wireframe-400 opacity-50'}">
+                                            <i class="fa-solid fa-display block mb-0.5"></i> Skärm
+                                        </div>
+                                        <!-- Ergonomisk Stol -->
+                                        <div class="p-1.5 rounded text-center ${item.ergonomisk_stol ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800' : 'bg-wireframe-100 dark:bg-wireframe-700 text-wireframe-400 opacity-50'}">
+                                            <i class="fa-solid fa-chair block mb-0.5"></i> Ergo-Stol
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Card Action Footer -->
+                        <div class="p-4 pt-0 flex items-center justify-between">
+                            <button onclick="toggleCompare(${item.boende_id})" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition ${isCompared ? 'bg-brand-600 text-white border-brand-600' : 'border-wireframe-300 dark:border-wireframe-600 text-wireframe-700 dark:text-wireframe-300 hover:bg-wireframe-100 dark:hover:bg-wireframe-700'}">
+                                <i class="fa-solid ${isCompared ? 'fa-check' : 'fa-plus'} mr-1"></i>
+                                ${isCompared ? 'Inlagd i Jämförelse' : 'Jämför [BDD 3]'}
+                            </button>
+                            <span class="text-[10px] code-font text-wireframe-400">View Row ID: ${item.boende_id}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Database Table View
+        function renderTable(items) {
+            const container = document.getElementById('tableRowsContainer');
+            container.innerHTML = items.map(item => `
+                <tr class="hover:bg-wireframe-50 dark:hover:bg-wireframe-700/50 transition">
+                    <td class="p-2.5 font-bold">${item.boende_id}</td>
+                    <td class="p-2.5 font-semibold text-brand-600 dark:text-brand-400">${item.namn}</td>
+                    <td class="p-2.5">${item.stad}</td>
+                    <td class="p-2.5">${item.land}</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 rounded">${item.tidszon}</span></td>
+                    <td class="p-2.5 font-bold text-emerald-600 dark:text-emerald-400">${item.wifi_hastighet_mbps} Mbps</td>
+                    <td class="p-2.5 font-bold text-teal-600 dark:text-teal-400">${item.avstand_coworking_meter} m</td>
+                    <td class="p-2.5 text-center">${item.skrivbord ? '<i class="fa-solid fa-check text-emerald-500"></i>' : '<i class="fa-solid fa-xmark text-red-400"></i>'}</td>
+                    <td class="p-2.5 text-center">${item.extern_skarm ? '<i class="fa-solid fa-check text-emerald-500"></i>' : '<i class="fa-solid fa-xmark text-red-400"></i>'}</td>
+                    <td class="p-2.5 text-center">${item.ergonomisk_stol ? '<i class="fa-solid fa-check text-emerald-500"></i>' : '<i class="fa-solid fa-xmark text-red-400"></i>'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Render Side-by-Side Comparison Matrix
+        function renderCompareMatrix() {
+            const container = document.getElementById('compareMatrixContainer');
+            const items = digitalNomadSeed.filter(x => compareList.includes(x.boende_id));
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="py-12 text-center text-wireframe-500 dark:text-wireframe-400">
+                        <i class="fa-solid fa-code-compare text-4xl mb-2"></i>
+                        <p class="font-bold">Inga boenden valda för jämförelse.</p>
+                        <p class="text-xs">Klicka på "+ Jämför [BDD 3]" på korten i sökresultatet för att lägga till objekt här.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b border-wireframe-300 dark:border-wireframe-700">
+                            <th class="p-3 bg-wireframe-50 dark:bg-wireframe-900 w-48 font-bold text-wireframe-500">Kriterium / User Story</th>
+                            ${items.map(item => `
+                                <th class="p-3 bg-wireframe-100 dark:bg-wireframe-700 min-w-[200px]">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <span class="font-bold text-sm block text-wireframe-900 dark:text-white">${item.namn}</span>
+                                            <span class="text-[11px] text-wireframe-500">${item.stad}, ${item.land}</span>
+                                        </div>
+                                        <button onclick="toggleCompare(${item.boende_id})" class="text-wireframe-400 hover:text-red-500">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                </th>
+                            `).join('')}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-wireframe-200 dark:divide-wireframe-700 code-font">
+                        <tr>
+                            <td class="p-3 font-bold bg-wireframe-50 dark:bg-wireframe-900 text-emerald-600">[E2S1] WiFi-Hastighet</td>
+                            ${items.map(item => `<td class="p-3 font-bold text-emerald-600">${item.wifi_hastighet_mbps} Mbps</td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold bg-wireframe-50 dark:bg-wireframe-900 text-blue-600">[E2S2] Dedicated Skrivbord</td>
+                            ${items.map(item => `<td class="p-3">${item.skrivbord ? 'JA (Inkluderat)' : 'NEJ'}</td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold bg-wireframe-50 dark:bg-wireframe-900 text-purple-600">[E2S3] Extern Skärm</td>
+                            ${items.map(item => `<td class="p-3">${item.extern_skarm ? 'JA (Tillgänglig)' : 'NEJ'}</td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold bg-wireframe-50 dark:bg-wireframe-900 text-amber-600">[E2S4] Ergonomisk Stol</td>
+                            ${items.map(item => `<td class="p-3">${item.ergonomisk_stol ? 'JA (Justerbar)' : 'NEJ'}</td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold bg-wireframe-50 dark:bg-wireframe-900 text-teal-600">[E2S5] Coworking-Avstånd</td>
+                            ${items.map(item => `<td class="p-3 font-bold">${item.avstand_coworking_meter} meter</td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold bg-wireframe-50 dark:bg-wireframe-900 text-indigo-600">[E2S6] Tidszon</td>
+                            ${items.map(item => `<td class="p-3">${item.tidszon}</td>`).join('')}
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Add/Remove item from Comparison Matrix
+        function toggleCompare(id) {
+            if (compareList.includes(id)) {
+                compareList = compareList.filter(x => x !== id);
+            } else {
+                compareList.push(id);
+            }
+            applyFilters();
+        }
+
+        function clearComparison() {
+            compareList = [];
+            applyFilters();
+        }
+
+        // Update Live SQL Console Output
+        function updateSqlConsole(chkDesk, chkMonitor, chkChair, maxDist, selectedTz) {
+            let sql = `SELECT *
+FROM v_digital_nomad_boende`;
+
+            let conditions = [];
+            if (currentWifiMin > 0) conditions.push(`wifi_hastighet_mbps >= ${currentWifiMin}`);
+            if (chkDesk) conditions.push(`skrivbord = 1`);
+            if (chkMonitor) conditions.push(`extern_skarm = 1`);
+            if (chkChair) conditions.push(`ergonomisk_stol = 1`);
+            if (maxDist < 9999) conditions.push(`avstand_coworking_meter <= ${maxDist}`);
+            if (selectedTz !== 'ALL') conditions.push(`tidszon = '${selectedTz}'`);
+
+            if (conditions.length > 0) {
+                sql += `\nWHERE ` + conditions.join('\n  AND ');
+            }
+
+            sql += `\nORDER BY wifi_hastighet_mbps DESC;`;
+
+            document.getElementById('sqlOutput').innerText = sql;
+        }
+
+        // Reset Filters
+        function resetFilters() {
+            currentWifiMin = 0;
+            document.getElementById('chkSkrivbord').checked = true;
+            document.getElementById('chkSkarm').checked = false;
+            document.getElementById('chkStol').checked = false;
+            document.getElementById('selCoworking').value = "9999";
+            document.getElementById('selTimezone').value = "ALL";
+            setWifiFilter(0);
+        }
+
+        // View Mode Switcher
+        function switchView(mode) {
+            activeView = mode;
+            const views = ['grid', 'table', 'compare'];
+
+            views.forEach(v => {
+                const content = document.getElementById(`view${capitalize(v)}`);
+                const btn = document.getElementById(`view${capitalize(v)}Btn`);
+
+                if (v === mode) {
+                    content.classList.remove('hidden');
+                    btn.className = "px-3 py-2 text-xs font-bold rounded-lg bg-wireframe-800 text-white dark:bg-white dark:text-wireframe-900 shadow-sm flex items-center space-x-2";
+                } else {
+                    content.classList.add('hidden');
+                    btn.className = "px-3 py-2 text-xs font-bold rounded-lg text-wireframe-600 dark:text-wireframe-400 hover:bg-wireframe-200 dark:hover:bg-wireframe-700 flex items-center space-x-2";
+                }
+            });
+        }
+
+        // Modal Toggles
+        function toggleTraceabilityModal() {
+            document.getElementById('traceabilityModal').classList.toggle('hidden');
+        }
+
+        function toggleSqlConsole() {
+            document.getElementById('sqlConsole').classList.toggle('hidden');
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = 'fa-solid fa-moon';
+            } else {
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-sun text-amber-400';
+            }
+        }
+
+        function copySql() {
+            const sqlText = document.getElementById('sqlOutput').innerText;
+            const temp = document.createElement('textarea');
+            temp.value = sqlText;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+
+            const btnText = document.getElementById('copyBtnText');
+            btnText.innerText = 'Kopierad!';
+            setTimeout(() => { btnText.innerText = 'Kopiera SQL'; }, 2000);
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+    </script>
+</body>
+</html>
