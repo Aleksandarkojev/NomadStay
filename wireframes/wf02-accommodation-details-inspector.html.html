@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NomadStay - Single Listing Query Inspector</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
+
+    <!-- Header Navigation -->
+    <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-600 text-white p-2 rounded-xl shadow-md">
+                    <i class="fa-solid fa-laptop-house text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-brand-600 to-teal-500 bg-clip-text text-transparent">NomadStay</span>
+                    <span class="text-xs ml-2 px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800">
+                        Detail Inspector (`boende_id = <span id="headerIdTag">1</span>`)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="flex items-center space-x-3">
+                <button id="toggleSqlBtn" onclick="toggleSqlPanel()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <i class="fa-solid fa-code text-brand-600 dark:text-brand-400"></i>
+                    <span class="hidden sm:inline">Visa SQL-Konsol</span>
+                </button>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ID Selector Bar & Quick Stats -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3 overflow-x-auto py-1">
+                <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                    <i class="fa-solid fa-filter mr-1 text-brand-500"></i> Välj ID (WHERE b.boende_id = X):
+                </span>
+                <div class="flex space-x-1.5" id="idButtonContainer">
+                    <!-- Dynamic ID buttons 1-8 generated via JS -->
+                </div>
+            </div>
+
+            <!-- Raw Data vs Visual Toggle -->
+            <div class="flex items-center bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
+                <button id="modeVisualBtn" onclick="setPayloadMode('visual')" class="px-3 py-1 rounded-md text-xs font-semibold bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition">
+                    <i class="fa-solid fa-eye mr-1"></i> UI Visning
+                </button>
+                <button id="modeJsonBtn" onclick="setPayloadMode('json')" class="px-3 py-1 rounded-md text-xs font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">
+                    <i class="fa-solid fa-brackets-curly mr-1"></i> Raw JSON Payload
+                </button>
+            </div>
+        </div>
+
+        <!-- Live SQL Console Box -->
+        <div id="sqlPanel" class="mb-6 bg-gray-900 text-gray-100 rounded-xl p-4 shadow-xl border border-gray-800 transition-all">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-gray-800">
+                <div class="flex items-center space-x-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    <i class="fa-solid fa-terminal text-brand-500"></i>
+                    <span>Exekveras i MySQL Database</span>
+                </div>
+                <button onclick="copySql()" class="text-xs text-gray-400 hover:text-white transition flex items-center space-x-1 bg-gray-800 px-2 py-1 rounded">
+                    <i class="fa-regular fa-copy"></i>
+                    <span id="copyText">Kopiera SQL</span>
+                </button>
+            </div>
+            <pre id="sqlQueryDisplay" class="code-font text-xs sm:text-sm text-brand-400 overflow-x-auto whitespace-pre-wrap leading-relaxed py-1"></pre>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+            <nav class="flex space-x-6">
+                <button id="tabOverviewBtn" onclick="switchTab('overview')" class="py-3 px-1 border-b-2 font-medium text-sm border-brand-600 text-brand-600 dark:text-brand-400 flex items-center space-x-2">
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>Property Overview (UI)</span>
+                </button>
+                <button id="tabDbBtn" onclick="switchTab('db')" class="py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center space-x-2">
+                    <i class="fa-solid fa-table"></i>
+                    <span>Database Query Result Table</span>
+                </button>
+                <button id="tabErBtn" onclick="switchTab('er')" class="py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center space-x-2">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <span>ER Relation & JOIN Map</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- JSON Raw View Payload (Hidden by default unless Payload Mode toggled) -->
+        <div id="jsonPayloadContainer" class="hidden mb-6 bg-gray-950 rounded-xl p-5 border border-gray-800">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-semibold code-font text-gray-400 uppercase">Response JSON Object [1 record returned]</span>
+                <span class="text-xs bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800">200 OK</span>
+            </div>
+            <pre id="jsonPayloadDisplay" class="code-font text-xs text-emerald-400 overflow-x-auto whitespace-pre leading-relaxed"></pre>
+        </div>
+
+        <!-- TAB 1: UI PROPERTY OVERVIEW -->
+        <div id="tabOverview" class="tab-content">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+                
+                <!-- Hero Image Column -->
+                <div class="lg:col-span-5 relative min-h-[280px] lg:min-h-full bg-gray-900">
+                    <img id="detailImg" src="" alt="" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <div class="absolute top-4 left-4">
+                        <span class="px-3 py-1 bg-brand-600 text-white text-xs font-bold rounded-full uppercase tracking-wider shadow-md">
+                            <span id="detailBoendetypTag"></span>
+                        </span>
+                    </div>
+                    <div class="absolute bottom-4 left-4 right-4 text-white">
+                        <span class="text-xs text-gray-300 font-mono">b.boende_id = <span id="detailId">1</span></span>
+                        <h1 id="detailName" class="text-2xl font-extrabold tracking-tight"></h1>
+                        <p class="text-sm text-gray-200 flex items-center mt-1">
+                            <i class="fa-solid fa-location-dot text-brand-400 mr-2"></i>
+                            <span id="detailLocation"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Database Mapping Details Column -->
+                <div class="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3 mb-4">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                Mappade Kolumnvärden
+                            </h3>
+                            <span class="text-xs code-font text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                SQL WHERE Clause Active
+                            </span>
+                        </div>
+
+                        <!-- Description Box -->
+                        <div class="mb-6">
+                            <label class="block text-xs code-font text-brand-600 dark:text-brand-400 mb-1">b.beskrivning</label>
+                            <div class="p-3.5 bg-gray-50 dark:bg-gray-700/40 border border-gray-200 dark:border-gray-700 rounded-xl text-sm leading-relaxed text-gray-700 dark:text-gray-200" id="detailDesc"></div>
+                        </div>
+
+                        <!-- Query Metric Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            <!-- WiFi Card -->
+                            <div class="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs code-font font-bold text-emerald-800 dark:text-emerald-300">b.wifi_hastighet_mbps</span>
+                                    <i class="fa-solid fa-wifi text-emerald-600 dark:text-emerald-400"></i>
+                                </div>
+                                <div class="text-2xl font-black text-emerald-700 dark:text-emerald-300 mt-2" id="detailWifi"></div>
+                                <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">Garanterad bredbandskapacitet</div>
+                            </div>
+
+                            <!-- Coworking Distance Card -->
+                            <div class="p-4 rounded-xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs code-font font-bold text-blue-800 dark:text-blue-300">b.avstand_coworking_meter</span>
+                                    <i class="fa-solid fa-person-walking text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                                <div class="text-2xl font-black text-blue-700 dark:text-blue-300 mt-2" id="detailCoworking"></div>
+                                <div class="text-xs text-blue-600 dark:text-blue-400 mt-1">Avstånd till närmsta coworking-hubb</div>
+                            </div>
+                        </div>
+
+                        <!-- Table Join Provenance Breakdown -->
+                        <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                                Tabell-Härkomst för detta objekt (JOIN Provenance)
+                            </h4>
+                            <div class="grid grid-cols-3 gap-2 text-xs">
+                                <div class="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <span class="block text-gray-400 code-font">boende (b)</span>
+                                    <span class="font-bold text-gray-800 dark:text-gray-200 truncate block mt-0.5" id="provBoende"></span>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <span class="block text-gray-400 code-font">boendetyp (bt)</span>
+                                    <span class="font-bold text-gray-800 dark:text-gray-200 truncate block mt-0.5" id="provType"></span>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <span class="block text-gray-400 code-font">plats (p)</span>
+                                    <span class="font-bold text-gray-800 dark:text-gray-200 truncate block mt-0.5" id="provPlats"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                            Status: <strong class="text-emerald-600 dark:text-emerald-400">Aktiv i databasen</strong>
+                        </span>
+                        <button onclick="simulatedBooking()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold text-sm shadow-md transition">
+                            Simulera Bokningsanrop
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: DATABASE RESULT TABLE -->
+        <div id="tabDb" class="tab-content hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden p-6">
+                <div class="mb-4 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white">Rå databas-resultatmängd</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Visar exakt 1 rad som returneras av SQL-frågan med uppkopplade tabellaliaser.</p>
+                    </div>
+                    <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs font-mono rounded-lg">Rows returned: 1</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-700/80 text-gray-700 dark:text-gray-300 code-font border-b border-gray-200 dark:border-gray-600">
+                                <th class="p-3 border-r border-gray-200 dark:border-gray-600">b.namn</th>
+                                <th class="p-3 border-r border-gray-200 dark:border-gray-600">bt.namn (boendetyp)</th>
+                                <th class="p-3 border-r border-gray-200 dark:border-gray-600">p.stad</th>
+                                <th class="p-3 border-r border-gray-200 dark:border-gray-600">p.land</th>
+                                <th class="p-3 border-r border-gray-200 dark:border-gray-600">b.beskrivning</th>
+                                <th class="p-3 border-r border-gray-200 dark:border-gray-600">b.wifi_hastighet_mbps</th>
+                                <th class="p-3">b.avstand_coworking_meter</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dbTableBody" class="divide-y divide-gray-200 dark:divide-gray-700 code-font text-gray-800 dark:text-gray-200">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ER RELATION & JOIN MAP -->
+        <div id="tabEr" class="tab-content hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white mb-2">ER-Relation och JOIN-struktur</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">
+                    Visualisering av hur tabellerna <code>boende</code>, <code>boendetyp</code> och <code>plats</code> kopplas ihop via Främmande Nycklar (Foreign Keys) för det valda objektet.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                    <!-- Table 1: boendetyp -->
+                    <div class="bg-amber-50/50 dark:bg-amber-950/20 border-2 border-amber-300 dark:border-amber-800 rounded-xl p-4">
+                        <div class="flex justify-between items-center border-b border-amber-200 dark:border-amber-800 pb-2 mb-3">
+                            <span class="font-bold text-amber-900 dark:text-amber-300 text-sm code-font">boendetyp (bt)</span>
+                            <span class="text-[10px] bg-amber-200 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded">Lookup Table</span>
+                        </div>
+                        <div class="space-y-2 text-xs code-font">
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-amber-200 dark:border-amber-900/50">
+                                <span class="text-gray-400">PK:</span> boendetyp_id = <strong id="erBtId"></strong>
+                            </div>
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-amber-200 dark:border-amber-900/50">
+                                <span class="text-gray-400">SELECT:</span> bt.namn = <strong id="erBtNamn" class="text-amber-700 dark:text-amber-400"></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table 2: boende (Main Table) -->
+                    <div class="bg-emerald-50/50 dark:bg-emerald-950/20 border-2 border-emerald-400 dark:border-emerald-700 rounded-xl p-4 relative shadow-md">
+                        <div class="flex justify-between items-center border-b border-emerald-200 dark:border-emerald-800 pb-2 mb-3">
+                            <span class="font-bold text-emerald-900 dark:text-emerald-300 text-sm code-font">boende (b) [Huvudtabell]</span>
+                            <span class="text-[10px] bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 px-1.5 py-0.5 rounded">Base Table</span>
+                        </div>
+                        <div class="space-y-2 text-xs code-font">
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-emerald-300 dark:border-emerald-800">
+                                <span class="text-gray-400">PK:</span> boende_id = <strong id="erBId" class="text-brand-600 dark:text-brand-400"></strong>
+                            </div>
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-emerald-300 dark:border-emerald-800">
+                                <span class="text-gray-400">FK:</span> boendetyp_id = <strong id="erBFkBt"></strong>
+                            </div>
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-emerald-300 dark:border-emerald-800">
+                                <span class="text-gray-400">FK:</span> plats_id = <strong id="erBFkPlats"></strong>
+                            </div>
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-emerald-300 dark:border-emerald-800">
+                                <span class="text-gray-400">ATTR:</span> wifi_hastighet_mbps = <strong id="erBWifi"></strong>
+                            </div>
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-emerald-300 dark:border-emerald-800">
+                                <span class="text-gray-400">ATTR:</span> avstand_coworking_meter = <strong id="erBDist"></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table 3: plats -->
+                    <div class="bg-blue-50/50 dark:bg-blue-950/20 border-2 border-blue-300 dark:border-blue-800 rounded-xl p-4">
+                        <div class="flex justify-between items-center border-b border-blue-200 dark:border-blue-800 pb-2 mb-3">
+                            <span class="font-bold text-blue-900 dark:text-blue-300 text-sm code-font">plats (p)</span>
+                            <span class="text-[10px] bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 rounded">Location Table</span>
+                        </div>
+                        <div class="space-y-2 text-xs code-font">
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-blue-200 dark:border-blue-900/50">
+                                <span class="text-gray-400">PK:</span> plats_id = <strong id="erPlatsId"></strong>
+                            </div>
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-blue-200 dark:border-blue-900/50">
+                                <span class="text-gray-400">SELECT:</span> p.stad = <strong id="erPStad" class="text-blue-700 dark:text-blue-400"></strong>
+                            </div>
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded border border-blue-200 dark:border-blue-900/50">
+                                <span class="text-gray-400">SELECT:</span> p.land = <strong id="erPLand" class="text-blue-700 dark:text-blue-400"></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explanation Footnote -->
+                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-xl border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300">
+                    <p class="font-semibold text-gray-800 dark:text-gray-200 mb-1"><i class="fa-solid fa-circle-info text-brand-500 mr-1"></i> Hur SQL JOIN-satsen fungerar:</p>
+                    <code class="code-font text-brand-600 dark:text-brand-400 block my-1">
+                        JOIN boendetyp bt ON bt.boendetyp_id = b.boendetyp_id<br>
+                        JOIN plats p ON p.plats_id = b.plats_id
+                    </code>
+                    Frågan länkar samman huvudtabellen <code>boende (b)</code> med dess uppslagstabeller för att hämta läsbara klartextnamn på boendetyp och plats i samma resultatmängd.
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JavaScript Data and Application Logic -->
+    <script>
+        // Full dataset extracted directly from nomadstay_mysql.sql database seed
+        const databaseSeed = [
+            {
+                boende_id: 1,
+                namn: "Nomad House Lisbon",
+                boendetyp_id: 1,
+                boendetyp: "Co-living",
+                plats_id: 1,
+                stad: "Lissabon",
+                land: "Portugal",
+                beskrivning: "Co-living med gemensamt kok, lounge och lugna arbetsytor.",
+                wifi_hastighet_mbps: 300,
+                avstand_coworking_meter: 150,
+                bild: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 2,
+                namn: "Eixample Work Apartments",
+                boendetyp_id: 2,
+                boendetyp: "Lägenhet",
+                plats_id: 2,
+                stad: "Barcelona",
+                land: "Spanien",
+                beskrivning: "Moderna lägenheter i centrala Barcelona med eget kök och skrivbord.",
+                wifi_hastighet_mbps: 500,
+                avstand_coworking_meter: 350,
+                bild: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 3,
+                namn: "Canggu Remote Village",
+                boendetyp_id: 1,
+                boendetyp: "Co-living",
+                plats_id: 3,
+                stad: "Canggu",
+                land: "Indonesien",
+                beskrivning: "Tropiskt co-living med integrerad coworking-paviljong vid poolen.",
+                wifi_hastighet_mbps: 250,
+                avstand_coworking_meter: 0,
+                bild: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 4,
+                namn: "Oresund Business Hotel",
+                boendetyp_id: 3,
+                boendetyp: "Hotell",
+                plats_id: 4,
+                stad: "Helsingborg",
+                land: "Sverige",
+                beskrivning: "Centralt hotell i Helsingborg med blixtsnabb fiber och business-lounge.",
+                wifi_hastighet_mbps: 1000,
+                avstand_coworking_meter: 200,
+                bild: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 5,
+                namn: "Berlin Focus Studios",
+                boendetyp_id: 2,
+                boendetyp: "Lägenhet",
+                plats_id: 5,
+                stad: "Berlin",
+                land: "Tyskland",
+                beskrivning: "Tysta och stilrena studios i Friedrichshain anpassade för distansarbete.",
+                wifi_hastighet_mbps: 400,
+                avstand_coworking_meter: 500,
+                bild: "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 6,
+                namn: "Alfama Boutique Hotel",
+                boendetyp_id: 3,
+                boendetyp: "Hotell",
+                plats_id: 1,
+                stad: "Lissabon",
+                land: "Portugal",
+                beskrivning: "Charmigt boutique-hotell i gamla stan med stabil uppkoppling.",
+                wifi_hastighet_mbps: 80,
+                avstand_coworking_meter: 800,
+                bild: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 7,
+                namn: "Split Social Hostel",
+                boendetyp_id: 4,
+                boendetyp: "Vandrarhem",
+                plats_id: 6,
+                stad: "Split",
+                land: "Kroatien",
+                beskrivning: "Socialt vandrarhem nära havet med gemensamma arbetsytor.",
+                wifi_hastighet_mbps: 150,
+                avstand_coworking_meter: 600,
+                bild: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                boende_id: 8,
+                namn: "Helsingborg Harbour Apartment",
+                boendetyp_id: 2,
+                boendetyp: "Lägenhet",
+                plats_id: 4,
+                stad: "Helsingborg",
+                land: "Sverige",
+                beskrivning: "Exklusiv lägenhet med havsutsikt, ergonomisk stol och tvättmaskin.",
+                wifi_hastighet_mbps: 600,
+                avstand_coworking_meter: 300,
+                bild: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+            }
+        ];
+
+        // State variables
+        let selectedId = 1;
+        let currentTab = 'overview';
+        let payloadMode = 'visual';
+
+        // Initialize on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIdButtons();
+            loadBoendeDetails(selectedId);
+        });
+
+        // Dynamic ID selector button rendering
+        function renderIdButtons() {
+            const container = document.getElementById('idButtonContainer');
+            container.innerHTML = databaseSeed.map(item => {
+                const isActive = item.boende_id === selectedId;
+                return `
+                    <button onclick="selectBoendeId(${item.boende_id})" 
+                            class="px-3 py-1 rounded-lg text-xs font-bold font-mono transition border ${
+                                isActive 
+                                ? 'bg-brand-600 text-white border-brand-600 shadow-sm' 
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            }">
+                        ID=${item.boende_id}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // Change active boende_id
+        function selectBoendeId(id) {
+            selectedId = id;
+            renderIdButtons();
+            loadBoendeDetails(selectedId);
+        }
+
+        // Load data into UI views
+        function loadBoendeDetails(id) {
+            const record = databaseSeed.find(x => x.boende_id === id) || databaseSeed[0];
+
+            // Update Header Tag & Query Box
+            document.getElementById('headerIdTag').innerText = record.boende_id;
+            
+            const sqlQuery = `SELECT 
+    b.namn,
+    bt.namn AS boendetyp,
+    p.stad,
+    p.land,
+    b.beskrivning,
+    b.wifi_hastighet_mbps,
+    b.avstand_coworking_meter
+FROM boende b
+JOIN boendetyp bt ON bt.boendetyp_id = b.boendetyp_id
+JOIN plats p ON p.plats_id = b.plats_id
+WHERE b.boende_id = ${record.boende_id};`;
+
+            document.getElementById('sqlQueryDisplay').innerText = sqlQuery;
+
+            // Update TAB 1: Overview
+            document.getElementById('detailId').innerText = record.boende_id;
+            document.getElementById('detailName').innerText = record.namn;
+            document.getElementById('detailBoendetypTag').innerText = record.boendetyp;
+            document.getElementById('detailLocation').innerText = `${record.stad}, ${record.land}`;
+            document.getElementById('detailDesc').innerText = record.beskrivning;
+            document.getElementById('detailWifi').innerText = `${record.wifi_hastighet_mbps} Mbps`;
+            document.getElementById('detailCoworking').innerText = record.avstand_coworking_meter === 0 ? '0 m (I boendet)' : `${record.avstand_coworking_meter} m`;
+            document.getElementById('detailImg').src = record.bild;
+
+            // Provenance tags
+            document.getElementById('provBoende').innerText = `${record.namn} (ID ${record.boende_id})`;
+            document.getElementById('provType').innerText = `${record.boendetyp} (ID ${record.boendetyp_id})`;
+            document.getElementById('provPlats').innerText = `${record.stad}, ${record.land} (ID ${record.plats_id})`;
+
+            // Update TAB 2: DB Result Table Row
+            document.getElementById('dbTableBody').innerHTML = `
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                    <td class="p-3 border-r border-gray-200 dark:border-gray-700 font-semibold text-brand-600 dark:text-brand-400">${record.namn}</td>
+                    <td class="p-3 border-r border-gray-200 dark:border-gray-700">${record.boendetyp}</td>
+                    <td class="p-3 border-r border-gray-200 dark:border-gray-700">${record.stad}</td>
+                    <td class="p-3 border-r border-gray-200 dark:border-gray-700">${record.land}</td>
+                    <td class="p-3 border-r border-gray-200 dark:border-gray-700 max-w-xs truncate">${record.beskrivning}</td>
+                    <td class="p-3 border-r border-gray-200 dark:border-gray-700 font-bold text-emerald-600 dark:text-emerald-400">${record.wifi_hastighet_mbps}</td>
+                    <td class="p-3 font-bold text-blue-600 dark:text-blue-400">${record.avstand_coworking_meter}</td>
+                </tr>
+            `;
+
+            // Update TAB 3: ER Map Values
+            document.getElementById('erBId').innerText = record.boende_id;
+            document.getElementById('erBFkBt').innerText = record.boendetyp_id;
+            document.getElementById('erBFkPlats').innerText = record.plats_id;
+            document.getElementById('erBWifi').innerText = record.wifi_hastighet_mbps;
+            document.getElementById('erBDist').innerText = record.avstand_coworking_meter;
+
+            document.getElementById('erBtId').innerText = record.boendetyp_id;
+            document.getElementById('erBtNamn').innerText = `"${record.boendetyp}"`;
+
+            document.getElementById('erPlatsId').innerText = record.plats_id;
+            document.getElementById('erPStad').innerText = `"${record.stad}"`;
+            document.getElementById('erPLand').innerText = `"${record.land}"`;
+
+            // Update Raw JSON Payload Display
+            const jsonOutput = {
+                query_status: "SUCCESS",
+                rows_affected: 1,
+                result: [
+                    {
+                        "b.namn": record.namn,
+                        "bt.boendetyp": record.boendetyp,
+                        "p.stad": record.stad,
+                        "p.land": record.land,
+                        "b.beskrivning": record.beskrivning,
+                        "b.wifi_hastighet_mbps": record.wifi_hastighet_mbps,
+                        "b.avstand_coworking_meter": record.avstand_coworking_meter
+                    }
+                ]
+            };
+            document.getElementById('jsonPayloadDisplay').innerText = JSON.stringify(jsonOutput, null, 2);
+        }
+
+        // Switch Tabs
+        function switchTab(tab) {
+            currentTab = tab;
+            const tabs = ['overview', 'db', 'er'];
+            
+            tabs.forEach(t => {
+                const content = document.getElementById(`tab${capitalize(t)}`);
+                const btn = document.getElementById(`tab${capitalize(t)}Btn`);
+                
+                if (t === tab) {
+                    content.classList.remove('hidden');
+                    btn.className = "py-3 px-1 border-b-2 font-medium text-sm border-brand-600 text-brand-600 dark:text-brand-400 flex items-center space-x-2";
+                } else {
+                    content.classList.add('hidden');
+                    btn.className = "py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center space-x-2";
+                }
+            });
+        }
+
+        // Set Payload Mode (Visual vs Raw JSON)
+        function setPayloadMode(mode) {
+            payloadMode = mode;
+            const jsonContainer = document.getElementById('jsonPayloadContainer');
+            const visBtn = document.getElementById('modeVisualBtn');
+            const jsonBtn = document.getElementById('modeJsonBtn');
+
+            if (mode === 'json') {
+                jsonContainer.classList.remove('hidden');
+                jsonBtn.className = "px-3 py-1 rounded-md text-xs font-semibold bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition";
+                visBtn.className = "px-3 py-1 rounded-md text-xs font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition";
+            } else {
+                jsonContainer.classList.add('hidden');
+                visBtn.className = "px-3 py-1 rounded-md text-xs font-semibold bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition";
+                jsonBtn.className = "px-3 py-1 rounded-md text-xs font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition";
+            }
+        }
+
+        // Helper Capitalize
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Toggle Dark Mode
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = 'fa-solid fa-moon';
+            } else {
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-sun text-amber-400';
+            }
+        }
+
+        // Toggle SQL Drawer
+        function toggleSqlPanel() {
+            const panel = document.getElementById('sqlPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        // Copy SQL to Clipboard
+        function copySql() {
+            const sqlText = document.getElementById('sqlQueryDisplay').innerText;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = sqlText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const copyTextBtn = document.getElementById('copyText');
+            copyTextBtn.innerText = 'Kopierad!';
+            setTimeout(() => {
+                copyTextBtn.innerText = 'Kopiera SQL';
+            }, 2000);
+        }
+
+        // Simulated Action
+        function simulatedBooking() {
+            alert(`Bokningssimulering startad för boende ID ${selectedId}!`);
+        }
+    </script>
+</body>
+</html>
