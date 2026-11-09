@@ -6,22 +6,45 @@ Payment
 
 {% block content %}
 
-<h1>Payment</h1>
+<div class="hero">
 
-<p>
-Complete the payment for the booking.
-</p>
+    <h1>Payment</h1>
 
-<h2>Booking Summary</h2>
+</div>
 
-<p>
-Booking details will be displayed here.
-</p>
+<div class="card">
 
-<h2>Payment Methods</h2>
+    <div class="card-content">
 
-<p>
-Card, Swish, PayPal and Invoice options will be available.
-</p>
+        <h2>{{ room[0] }}</h2>
+
+        <p>
+            {{ room[1] }} SEK/night
+        </p>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-content">
+
+        <h2>Choose Payment Method</h2>
+
+        <div class="badge">💳 Card</div>
+        <div class="badge">📱 Swish</div>
+        <div class="badge">🧾 Invoice</div>
+        <div class="badge">💰 PayPal</div>
+
+        <br><br>
+
+        <button class="button">
+            Confirm Payment
+        </button>
+
+    </div>
+
+</div>
 
 {% endblock %}

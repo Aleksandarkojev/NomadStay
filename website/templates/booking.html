@@ -6,28 +6,63 @@ Booking
 
 {% block content %}
 
-<h1>Booking</h1>
+<div class="hero">
+
+    <h1>Booking</h1>
+
+</div>
+
+<div class="card">
+
+    <div class="card-content">
+
+        <h2>{{ room[1] }}</h2>
 
 <p>
-Create a reservation for the selected accommodation.
+    Price:
+    {{ room[2] }} SEK/night
 </p>
 
-<h2>Room Selection</h2>
+<hr>
 
 <p>
-Available rooms will be loaded from the database.
+    Example Cost Calculation
 </p>
-
-<h2>Booking Details</h2>
 
 <p>
-Check-in, check-out and guest information will appear here.
+    7 nights:
+    {{ room[2] * 7 }} SEK
 </p>
-
-<h2>Total Price</h2>
 
 <p>
-Price calculation and discounts will be displayed here.
+    14 nights:
+    {{ room[2] * 14 }} SEK
 </p>
+
+        <hr>
+
+        <p>Check-in</p>
+        <input type="date">
+
+        <br><br>
+
+        <p>Check-out</p>
+        <input type="date">
+
+        <br><br>
+
+        <p>Guests</p>
+        <input type="number" value="1">
+
+        <br><br>
+
+        <a class="button"
+           href="/payment/{{ room[0] }}">
+            Continue To Payment
+        </a>
+
+    </div>
+
+</div>
 
 {% endblock %}

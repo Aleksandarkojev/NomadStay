@@ -1,15 +1,54 @@
 {% extends "base.html" %}
 
 {% block title %}
-NomadStay Home
+NomadStay
 {% endblock %}
 
 {% block content %}
 
-<h1>Welcome to NomadStay</h1>
+<div class="hero">
 
-<p>
-A booking platform for digital nomads and remote workers.
-</p>
+    <h1>Find Your Next Remote Workspace</h1>
+
+    <p>
+        Discover accommodations built for digital nomads and remote workers.
+    </p>
+
+</div>
+
+<div class="cards">
+
+{% for accommodation in accommodations %}
+
+<div class="card">
+
+   <img src="{{ url_for('static',
+filename='images/' + accommodation[4]) }}"
+     style="
+        width:100%;
+        height:220px;
+        object-fit:cover;
+     ">
+
+    <div class="card-content">
+
+        <h2>{{ accommodation[1] }}</h2>
+
+        <p>📶 WiFi: {{ accommodation[2] }} Mbps</p>
+
+        <p>💼 Coworking Distance: {{ accommodation[3] }} m</p>
+
+        <a class="button"
+           href="/accommodation/{{ accommodation[0] }}">
+            View Accommodation
+        </a>
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
 
 {% endblock %}

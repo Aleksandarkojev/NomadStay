@@ -1,33 +1,188 @@
 {% extends "base.html" %}
 
 {% block title %}
-Accommodation Details
+{{ accommodation[0] }}
 {% endblock %}
 
 {% block content %}
 
-<h1>Accommodation Details</h1>
+<div class="card">
 
-<p>
-Information about the selected accommodation will appear here.
-</p>
+    <div style="
+        position:relative;
+        margin-bottom:20px;
+    ">
 
-<h2>Facilities</h2>
+        <img src="{{ url_for('static', filename='images/' + accommodation[4]) }}"
+             style="
+                width:100%;
+                height:500px;
+                object-fit:cover;
+                border-radius:16px;
+             ">
 
-<p>
-Facilities will be loaded from the database.
-</p>
+        <div style="
+            position:absolute;
+            bottom:30px;
+            left:30px;
+            background:rgba(0,0,0,0.6);
+            color:white;
+            padding:20px;
+            border-radius:12px;
+            max-width:600px;
+        ">
 
-<h2>Workspaces</h2>
+            <h1>{{ accommodation[0] }}</h1>
 
-<p>
-Workspace information will be loaded from the database.
-</p>
+            <p>{{ accommodation[1] }}</p>
 
-<h2>Reviews</h2>
+        </div>
 
-<p>
-Accommodation reviews will be loaded from the database.
-</p>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-content">
+
+        <h2>Remote Work Information</h2>
+
+        <div class="badge">
+            📶 {{ accommodation[2] }} Mbps
+        </div>
+
+        <div class="badge">
+            💼 {{ accommodation[3] }} m to coworking
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-content">
+
+        <h2>Facilities</h2>
+
+        <div style="
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+        ">
+
+        {% for facility in facilities %}
+
+            <div class="badge">
+                ✅ {{ facility[0] }}
+            </div>
+
+        {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-content">
+
+        <h2>Available Rooms</h2>
+
+        {% for room in rooms %}
+
+            <div style="
+                border:1px solid #ddd;
+                padding:15px;
+                border-radius:10px;
+                margin-bottom:10px;
+            ">
+
+                <strong>{{ room[0] }}</strong>
+
+                <p>
+                    {{ room[1] }} SEK/night
+                </p>
+
+                <a class="button"
+   href="/booking/{{ loop.index }}">
+    Book Now
+</a>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-content">
+
+        <h2>Workspace Options</h2>
+
+        {% for workspace in workspaces %}
+
+            <div style="
+                border:1px solid #ddd;
+                padding:15px;
+                border-radius:10px;
+                margin-bottom:10px;
+                background:white;
+            ">
+
+                <h3>{{ workspace[0] }}</h3>
+
+                <p>🖥️ External Monitor: {{ workspace[2] }}</p>
+
+                <p>🪑 Ergonomic Chair: {{ workspace[3] }}</p>
+
+                <p>👥 Seats: {{ workspace[4] }}</p>
+
+                <p>💰 {{ workspace[5] }} SEK/hour</p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-content">
+
+        <h2>Reviews</h2>
+
+        {% for review in reviews %}
+
+            <div style="
+                background:#fafafa;
+                padding:15px;
+                border-radius:12px;
+                margin-bottom:15px;
+            ">
+
+                <strong>
+                    ⭐ {{ review[0] }}/5
+                </strong>
+
+                <p>
+                    {{ review[1] }}
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
 
 {% endblock %}
