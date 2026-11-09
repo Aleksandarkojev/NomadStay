@@ -17,10 +17,9 @@ def accommodation(id):
     return render_template("accommodation.html")
 
 
-
 @app.route("/booking/<int:id>")
 def booking(id):
-    return f"<h1>Booking {id}</h1>"
+    return render_template("booking.html")
 
 
 @app.route("/payment/<int:id>")
