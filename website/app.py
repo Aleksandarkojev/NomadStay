@@ -12,10 +12,10 @@ def home():
 def search():
     return render_template("search.html")
 
-
 @app.route("/accommodation/<int:id>")
 def accommodation(id):
-    return f"<h1>Accommodation {id}</h1>"
+    return render_template("accommodation.html")
+
 
 
 @app.route("/booking/<int:id>")
