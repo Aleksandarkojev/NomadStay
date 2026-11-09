@@ -34,7 +34,7 @@ def profile():
 
 @app.route("/admin")
 def admin():
-    return "<h1>Admin Dashboard</h1>"
+    return render_template("admin.html")
 
 
 if __name__ == "__main__":
