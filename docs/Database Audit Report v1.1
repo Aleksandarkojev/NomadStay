@@ -1,0 +1,251 @@
+Database Audit Report v1
+Purpose
+This document records findings, observations, and improvement opportunities identified during the continued development of the NomadStay database.
+
+The audit was performed after the original Scrum project was completed and before development of the final portfolio website.
+
+Audit Summary
+Architecture Assessment
+Database Architecture: 9.0 / 10
+
+The overall schema is well structured and does not require redesign.
+
+The database supports:
+
+User management
+Profiles and preferences
+Accommodation management
+Room management
+Bookings
+Payments
+Invoices
+Reviews
+Favorites
+Workspace bookings
+Digital nomad functionality
+Strengths
+Requirements Traceability
+The project demonstrates a complete development chain:
+
+Interviews
+→ User Stories
+→ BDD Scenarios
+→ ER Models
+→ SQL Database
+→ Query Wireframes
+→ UI Design
+→ Future Website
+
+Digital Nomad Features
+The database supports:
+
+WiFi speeds
+Coworking distance
+Workspace booking
+External monitors
+Ergonomic chairs
+Long-stay discounts
+Good Database Design
+Most core entities are normalized and correctly separated.
+
+Examples:
+
+boende
+rum
+bokning
+betalning
+faktura
+recension
+favorit
+arbetsplats
+Findings
+F01 - Incomplete Cost Breakdown Implementation
+Priority: High
+
+Initial audit identified missing cost breakdown records for Bookings 3-6.
+
+Cleanup Sprint 1 completed repairs for:
+
+Booking 4
+Booking 5
+Booking 6
+Remaining:
+
+Booking 3 cost breakdown reconstruction
+Impact:
+
+Reduced transparency
+Harder invoice generation
+Weaker reporting
+Status:
+
+Partially Resolved
+
+F02 - Booking 3 Data Anomaly
+Priority: High
+
+Booking 3 does not follow the standard pricing model used by the other bookings.
+
+Expected price:
+
+5 nights × 860 SEK = 4300 SEK
+
+Stored booking total:
+
+4480 SEK
+
+Difference:
+
+180 SEK
+
+Activities and workspace bookings do not explain the difference.
+
+Recommendation:
+
+Investigate and correct the booking before expanding the dataset.
+
+Status:
+
+Open
+
+F03 - Duplicate Phone Storage
+Priority: Medium
+
+Phone numbers currently exist in both:
+
+anvandare.telefon
+profil.telefonnummer
+Future versions should use one authoritative source.
+
+Status:
+
+Open
+
+F04 - Availability Logic
+Priority: Medium
+
+Room availability currently depends on both:
+
+room availability flag
+booking dates
+Long-term improvements may be required.
+
+Status:
+
+Open
+
+F05 - WiFi Verification
+Priority: Medium
+
+The interviews consistently identified verified WiFi as one of the most important requirements.
+
+The database currently stores WiFi speed but does not include any verification mechanism.
+
+Possible future additions:
+
+WiFi verification status
+Verification date
+Verification source
+Historical speed tests
+Status:
+
+Future Enhancement
+
+Cleanup Progress
+Completed:
+
+Booking 4 cost breakdown restored
+Booking 5 cost breakdown restored
+Booking 6 cost breakdown restored
+Remaining:
+
+Booking 3 cost breakdown reconstruction
+Booking 3 anomaly investigation
+Strongly Designed Tables
+The following tables were reviewed and are considered structurally sound:
+
+anvandare
+profil
+boende
+arbetsplats
+favorit
+recension
+rabatt
+betalning
+faktura
+bokning
+bokning_rum
+aktivitet
+aktivitetsbokning
+No redesign is currently recommended.
+
+Dataset Assessment
+The current dataset functions primarily as a demonstration dataset rather than a portfolio-scale production dataset.
+
+Current record counts:
+
+Users: 8
+Profiles: 5
+Accommodations: 8
+Rooms: 16
+Bookings: 6
+Reviews: 2
+Payments: 6
+Workspaces: 10
+Recommended Data Expansion Targets
+Phase 1
+20 Accommodations
+40 Rooms
+25 Reviews
+25 Bookings
+Phase 2
+30 Accommodations
+60 Rooms
+50 Reviews
+50 Bookings
+The goal is to provide realistic data for the future portfolio website.
+
+Website Readiness Assessment
+Ready Now
+Homepage
+Search Results
+Accommodation Details
+User Profile
+Admin Dashboard
+Reviews
+Favorites
+Payments
+Needs Improvement Before Launch
+Booking 3 anomaly resolution
+Complete cost breakdown consistency
+Larger review dataset
+Richer accommodation content
+WiFi verification feature (future version)
+Next Development Phase
+Database Stabilization
+Resolve Booking 3 anomaly
+Complete Booking 3 cost breakdown
+Review duplicate fields
+Review availability strategy
+Data Enrichment
+Add more accommodations
+Add more rooms
+Add more bookings
+Add more reviews
+Add more favorites
+Add more workspace bookings
+Add more activity bookings
+Website Development
+Planned MVP:
+
+Homepage
+Search Results
+Accommodation Details
+Booking Flow
+Payment Flow
+User Profile
+Admin Dashboard
+Status
+Audit Version 1.1
+
+Database structure audited. Core booking architecture verified. Cleanup Sprint 1 completed. Database stabilization in progress.
