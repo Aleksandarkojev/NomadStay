@@ -29,7 +29,7 @@ def payment(id):
 
 @app.route("/profile")
 def profile():
-    return "<h1>User Profile</h1>"
+    return render_template("profile.html")
 
 
 @app.route("/admin")
