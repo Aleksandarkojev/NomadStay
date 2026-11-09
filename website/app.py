@@ -10,7 +10,7 @@ def home():
 
 @app.route("/search")
 def search():
-    return "<h1>Search Results</h1>"
+    return render_template("search.html")
 
 
 @app.route("/accommodation/<int:id>")
