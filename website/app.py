@@ -24,7 +24,7 @@ def booking(id):
 
 @app.route("/payment/<int:id>")
 def payment(id):
-    return f"<h1>Payment {id}</h1>"
+    return render_template("payment.html")
 
 
 @app.route("/profile")
