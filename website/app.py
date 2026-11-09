@@ -1,11 +1,11 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def home():
-    return "<h1>NomadStay</h1><p>Homepage coming soon.</p>"
+    return render_template("home.html")
 
 
 @app.route("/search")
