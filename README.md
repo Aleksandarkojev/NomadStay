@@ -148,11 +148,9 @@ website/
 
 ## Screenshots
 
-(Add screenshots here)
-
 ### Homepage
 
-![Homepage](docs/screenshots/homepage.png)
+![Homepage](docs/screenshots/homescreen.png)
 
 ### Search
 
@@ -160,14 +158,15 @@ website/
 
 ### Accommodation Details
 
-![Accommodation](docs/screenshots/accommodation.png)
+![Accommodation](docs/screenshots/1%20lägenhet.png)
 
 ### Booking
 
 ![Booking](docs/screenshots/booking.png)
 
----
+### Payment
 
+![Payment](docs/screenshots/payment.png)
 ## Author
 
 Aleksandar Koyev
